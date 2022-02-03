@@ -59,8 +59,6 @@ Programming goals:
 int MAXWIDTH = 20; // Max width of sudoku
 int MAXLENGTH = 20; // Max length of sudoku
 #define MAX(A,B) ((A)>(B))?(A):(B);
-int readData(FILE *streamname){}
-
 struct sudoku{
     int* dataMatrix;
      // a 9 x 9 matrix contains 3 boxes on top, 3 boxes in middle, 3 in bottom
@@ -76,56 +74,59 @@ int initialize_posSet(int *possMatrix, int row, int col)
 }
 
 
-int readFile(char *filename)
+int readFile(char filename[], int *maxdimension, int *numbercount)
 {
-
-}
-
-
-// TODO: Create a seperate function for reading in file
-int main(int argc, char **argv){
     // TODO: Regex to set custom filename
-    char defaultfilename[] = "sudoku_input.txt";
     // readGit source control manager in the file
     FILE *fp;
-    fp = fopen(defaultfilename, "r");
-    // initialize variablesto zero
-    int buffer, numbercount;
-    buffer = numbercount = 0;
+    printf("%s", filename);
+    fp = fopen(filename, "r");
     int MAXARRAY = MAXWIDTH * MAXLENGTH;
-    int MAXDIMENSION = 0;
+    *maxdimension = 0;
     if (MAXWIDTH == MAXLENGTH){
-        MAXDIMENSION = MAXWIDTH;
+        *maxdimension = MAXWIDTH;
     }
     else if (MAXWIDTH != MAXLENGTH){
-        MAXDIMENSION = MAX(MAXWIDTH,MAXLENGTH);
+        *maxdimension = MAX(MAXWIDTH,MAXLENGTH);
     }
     else{
         printf("Dimension weirdness");
-        return 1;
+        //     char filename[] = "sudoku_input.txt";return 1;
     }
+    *numbercount = 0;
     int sudoku_array[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null.
     printf("variables initialized. \n");
     for (int i = 0; i < MAXARRAY; i++){
         sudoku_array[i] = -1; 
     }
-    printf("scanning %s \n", defaultfilename);
+    printf("scanning %s \n", filename);
     // TODO : Detect non-numeric characters
+    int buffer = 0;
     while (fscanf(fp, "%d", &buffer) != EOF){
     if (buffer < 0){
             printf("\n Detected negative number. Exiting program.");
             return 1;
             }
-        sudoku_array[numbercount] = numbercount;
+        sudoku_array[*numbercount] = *numbercount;
         printf("%d", buffer);
-        numbercount += 1;
+        *numbercount += 1;
     }
-    printf("\nCounted %d numbers \n", numbercount);
+    printf("\nCounted %d numbers \n", *numbercount);
+    
+    return 0;
+}
 
+// TODO: Create a seperate function for reading in file
+int main(void){
+    char filename[] = "sudoku_input.txt";
+    int maxdimension;
+    int numbercount;
+
+    readFile(filename, &maxdimension, &numbercount);
     // Count the size of the input. Does it match known dimensions?
 
     int DataMatrixDimension = 0; // Figure out the square dimension of the data
-    for (int i = 1; i <= MAXDIMENSION; i++)
+    for (int i = 1; i <= maxdimension; i++)
     {
         if (numbercount == i * i)
         {
