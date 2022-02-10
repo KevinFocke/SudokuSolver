@@ -31,7 +31,6 @@ int readFile(char filename[], int *numbercount, int sudoku_array[])
     fp = fopen(filename, "r");
 
 
-
     *numbercount = 0;
     printf("Initializing Max Sudoku array.");
     printf("scanning %s\n", filename);
@@ -51,6 +50,24 @@ int readFile(char filename[], int *numbercount, int sudoku_array[])
     {
     printf("%d", sudoku_array[i]);    
     }
+
+    int dataMatrixDimension = 0; // Figure out the square dimension of the data
+    for (int i = 1; i <= MAXDIMENSION; i++)
+    {
+        if (*numbercount == i * i)
+        {
+            dataMatrixDimension = i;
+            printf("\nThe data dimension is %d x %d \n", dataMatrixDimension, dataMatrixDimension);
+            break;
+        }
+    }
+
+    if (dataMatrixDimension == 0)
+    {
+        printf("\n Invalid numbercount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*numbercount,MAXDIMENSION);
+        return 1;
+    }
+    
     printf("\nCounted %d numbers \n", *numbercount);
 
     return 0;
@@ -83,22 +100,7 @@ int main(void){
     // Argument: struct sudoku *sud
     // Count the size of the input. Does it match known dimensions?
 
-    int dataMatrixDimension = 0; // Figure out the square dimension of the data
-    for (int i = 1; i <= MAXDIMENSION; i++)
-    {
-        if (numbercount == i * i)
-        {
-            dataMatrixDimension = i;
-            printf("The data dimension is %d x %d \n", dataMatrixDimension, dataMatrixDimension);
-            break;
-        }
-    }
 
-    if (dataMatrixDimension == 0)
-    {
-        printf("Invalid numbercount; does not match square dimensions. Numbers received: %d.", numbercount);
-        return 1;
-    }
     // TODO: Free Malloc
 
 
