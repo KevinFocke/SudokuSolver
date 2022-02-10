@@ -22,7 +22,7 @@ struct sudoku{
     int *matrix2D[MAXARRAY];
     };
 
-int readFile(char filename[], int *numbercount, int sudoku_array[])
+int readFile(char filename[], int *numbercount, int sudoku_array[], int *dataMatrixDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
@@ -51,18 +51,17 @@ int readFile(char filename[], int *numbercount, int sudoku_array[])
     printf("%d", sudoku_array[i]);    
     }
 
-    int dataMatrixDimension = 0; // Figure out the square dimension of the data
     for (int i = 1; i <= MAXDIMENSION; i++)
     {
         if (*numbercount == i * i)
         {
-            dataMatrixDimension = i;
-            printf("\nThe data dimension is %d x %d \n", dataMatrixDimension, dataMatrixDimension);
+            *dataMatrixDimension = i;
+            printf("\nThe data dimension is %d x %d \n", *dataMatrixDimension, *dataMatrixDimension);
             break;
         }
     }
 
-    if (dataMatrixDimension == 0)
+    if (*dataMatrixDimension == 0)
     {
         printf("\n Invalid numbercount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*numbercount,MAXDIMENSION);
         return 1;
@@ -79,18 +78,21 @@ int main(void){
     // Init vars
     char filename[] = "sudoku_input.txt";
     int numbercount = 0;
+    int dataMatrixDimension = 0;
     struct sudoku sud;
     // Initialize the maximum possible sudoku array
-    int sudoku_array[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null.
+    int sudoku_array[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
     for (int i = 0; i < MAXARRAY; i++)
     {
         sudoku_array[i] = -1; 
     }
+
     //Function calls
-    if (readFile(filename, &numbercount, sudoku_array))
+    if (readFile(filename, &numbercount, sudoku_array, &dataMatrixDimension))
     {
         return 1;
     }
+
     // Set sudoku
     sud.size = numbercount;
     sud.collength = sud.rowlength = MAXDIMENSION; //square dimensions
