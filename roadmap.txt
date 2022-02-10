@@ -25,6 +25,7 @@ Programming goals:
 - Become more efficient in compiling & running the code.
 
 Ver 3:
+- Add test cases
 - Implement more efficient possMatrix
 - Graph the timings of different algorithms.
 - Increase the portability of the code
@@ -42,6 +43,7 @@ Ver 5:
 Ver 6:
 - Add photo mode, make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
+- Convert ints to a shorter type depending on needed number range?
 
 
 Programming goals:
@@ -49,3 +51,7 @@ Programming goals:
 
 
 */
+
+Lessons learned:
+
+- Be more consistent with casing. CAPITALS for globals. camelCase for local vars.
