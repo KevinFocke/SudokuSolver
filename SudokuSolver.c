@@ -1,52 +1,5 @@
 
-/* Sudoku solver
-
-Ver 1: 
-- Create a program that solves simple sudokus inefficiently.
-- Can handle square boards of different sizes.
-- Can read in space-delimited text files.
-- Is extendible with different algorithms.
-
-
-Programmming goals:
-- Become more efficient with vim and more familiar with visual studio code.
-- Think about data representations and make sure the code is extendable.
-
-Ver 2: 
-- Refactor code into multiple subroutines
-- Implement Databox structure
-- Add command line recognizition of filename=mytext.txt using fgets and regex
-https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
-- Increase portability by typedeffing eg. int becomes int 32
-- Implement backtracking algorithm
-
-
-Programming goals:
-- Start tracking changes with git
-- Become more efficient in compiling & running the code.
-
-Ver 3:
-- Implement more efficient possMatrix
-- Graph the timings of different algorithms.
-- Increase the portability of the code
-- Refactor code to make more extendible.
-
-Ver 4:
-- Implement race conditions per box
-- Add ability to queue multiple sudoku's
-- Graph the timings accross sudoku's across algorithms
-
-Ver 5:
-- Add cloud computing support
-
-Ver 6:
-- Add photo mode, make picture of sudoku, translates into matrix
-
-Programming goals:
-- Completely mouse-free coding.
-
-
-*/
+// Super Sudoku Solver
 
 // Header
 
@@ -54,52 +7,57 @@ Programming goals:
 #include <ctype.h>
 #include <math.h>
 #include <regex.h>
-
-// TODO: Check types of global variables
-int MAXWIDTH = 20; // Max width of sudoku
-int MAXLENGTH = 20; // Max length of sudoku
+#include <stdlib.h>
+// Supported sudoku is 9 x 9
+int MAXWIDTH = 9; // Max width of sudoku;
+int MAXLENGTH = 9; // Max length of sudoku
 #define MAX(A,B) ((A)>(B))?(A):(B);
+
 struct sudoku{
     int* dataMatrix;
      // a 9 x 9 matrix contains 3 boxes on top, 3 boxes in middle, 3 in bottom
-    int dimensionWidth;
-    int dimensionLength;
+    int dimension;
     int numberCount;
     };
 
-
-int initialize_posSet(int *possMatrix, int row, int col)
+int checkDimensions(int *dimension1, int *dimension2)
 {
-    return 0;
+    // Are the dimensions square?
+    if (*dimension1 == *dimension2)
+    {
+        return 0;
+    }
+    else
+    {
+        printf("Dimension weirdness. Sudoku's should have square dimensions \n Dim 1: %d\n Dim 2: %d \n", *dimension1, *dimension2);
+        return 1;
+        //     char filename[] = "sudoku_input.txt";return 1;
+    }
 }
 
-
-int readFile(char filename[], int *maxdimension, int *numbercount)
+int readFile(char filename[], int *maxdimension, int *numbercount, struct sudoku *sud)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
     FILE *fp;
     printf("%s", filename);
     fp = fopen(filename, "r");
+
+    // Calc max possible array
     int MAXARRAY = MAXWIDTH * MAXLENGTH;
     *maxdimension = 0;
     if (MAXWIDTH == MAXLENGTH){
         *maxdimension = MAXWIDTH;
     }
-    else if (MAXWIDTH != MAXLENGTH){
-        *maxdimension = MAX(MAXWIDTH,MAXLENGTH);
-    }
-    else{
-        printf("Dimension weirdness");
-        //     char filename[] = "sudoku_input.txt";return 1;
-    }
+
     *numbercount = 0;
+    printf("Initializing Max Sudoku array.");
     int sudoku_array[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null.
-    printf("variables initialized. \n");
-    for (int i = 0; i < MAXARRAY; i++){
+    for (int i = 0; i < MAXARRAY; i++)
+    {
         sudoku_array[i] = -1; 
     }
-    printf("scanning %s \n", filename);
+    printf("scanning %s\n", filename);
     // TODO : Detect non-numeric characters
     int buffer = 0;
     while (fscanf(fp, "%d", &buffer) != EOF){
@@ -107,9 +65,14 @@ int readFile(char filename[], int *maxdimension, int *numbercount)
             printf("\n Detected negative number. Exiting program.");
             return 1;
             }
-        sudoku_array[*numbercount] = *numbercount;
-        printf("%d", buffer);
+        sudoku_array[*numbercount] = buffer; // put current int in array
         *numbercount += 1;
+    }
+
+    printf("Scan results: \n");
+    for (int i= 0; i < *numbercount; i++)
+    {
+    printf("%d", sudoku_array[i]);    
     }
     printf("\nCounted %d numbers \n", *numbercount);
     
@@ -118,11 +81,23 @@ int readFile(char filename[], int *maxdimension, int *numbercount)
 
 // TODO: Create a seperate function for reading in file
 int main(void){
-    char filename[] = "sudoku_input.txt";
-    int maxdimension;
-    int numbercount;
+    // Check globals
+    if (checkDimensions(&MAXLENGTH,&MAXWIDTH))
+    {
+        return 1;
+    };
 
-    readFile(filename, &maxdimension, &numbercount);
+    // Init vars
+    char filename[] = "sudoku_input.txt";
+    int maxdimension, numbercount = {0};
+    //TODO: Enabling queuing sudokus
+    struct sudoku sud; 
+    // *psud = &sud; // create a sud, and a pointer to it
+    //Function calls
+    if (readFile(filename, &maxdimension, &numbercount, &sud))
+    {
+        return 1;
+    }
     // Count the size of the input. Does it match known dimensions?
 
     int DataMatrixDimension = 0; // Figure out the square dimension of the data
@@ -141,25 +116,8 @@ int main(void){
         printf("Invalid numbercount. Numbers received: %d.", numbercount);
         return 1;
     }
+    // TODO: Free Malloc
 
-    int possSpace[DataMatrixDimension]; // The total ranges of numbers that could be in any one element
-    // create possibilityspace
-    for (int i = 0; i < DataMatrixDimension; possSpace[i++] = i+1);
-    /*printf("These are the total possabilities per element, before checking validity:");
-    for (int i = 0; i < DataMatrixDimension; i++)
-    {
-        printf("%d", possSpace[i]);
-    }*/
-
-
-
-
-
-
-
-
-
-    // Go to the posSet with the lowest amount of unsolved
 
     // implement vertical line checker
     // implement horizontal line checker
