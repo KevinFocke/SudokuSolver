@@ -2,8 +2,6 @@
 // Sudoku Solver
 #include <stdio.h>
 #include <ctype.h>
-#include <math.h>
-#include <regex.h>
 #include <stdlib.h>
 
 // Max supported sudoku is 9 x 9
@@ -12,14 +10,20 @@ const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of m
 
 // Sudoku is represented as a 2D matrix
 struct sudoku
-    {
+{
     int size;
     int rowLength;
     int colLength;
-    int **dataMatrix;
-    };
+    int **matrix; // 2D matrix (list of pointers to arrays containing digits)
+    int **box; // list of pointers to Boxes
+};
 
 
+struct box
+{
+    int unsolvedCount; // How many elements are currently unsolved?
+    int **boxMatrix; // (list of pointers to arrays containing pointers)
+};
 
 int printMatrix(int **matrix, int rowLength, int colLength)
 {
@@ -78,12 +82,12 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
-    sud->dataMatrix = matrix;
-    printMatrix(sud->dataMatrix, sud->rowLength, sud->colLength);
+    sud->matrix = matrix;
+    printMatrix(sud->matrix, sud->rowLength, sud->colLength);
     return 0;
 }
 
-int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataMatrixDimension)
+int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
@@ -108,12 +112,12 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataMatrixDi
     {
         if (*dataCount == i * i)
         {
-            *dataMatrixDimension = i;
+            *matrixDimension = i;
             break;
         }
     }
 
-    if (*dataMatrixDimension == 0)
+    if (*matrixDimension == 0)
     {
         printf("\n Invalid dataCount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*dataCount,MAXDIMENSION);
         exit(1);
@@ -123,15 +127,18 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataMatrixDi
 }
 
 int solveSudoku()
-{return 0;}
+{
+    // keep track of: steps taken, cycles taken
+
+    return 0;}
 
 int outputSudoku()
 {
     // print
 
     // save to disk
-    
-     
+
+
     return 0;}
 
 int main(void){
@@ -142,7 +149,7 @@ int main(void){
     // Process per Sudoku
 
     int dataCount;
-    int dataMatrixDimension;
+    int matrixDimension;
     // Initialize the maximum possible sudoku array; one-dimensional
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
     for (int i = 0; i < MAXARRAY; i++)
@@ -151,7 +158,7 @@ int main(void){
     }
 
     //Function calls
-    if (readFile(filename, &dataCount, sudokuArray, &dataMatrixDimension))
+    if (readFile(filename, &dataCount, sudokuArray, &matrixDimension))
     {
         printf("Failed to read file.");
         exit(1);
@@ -159,7 +166,7 @@ int main(void){
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
-    initSudoku(&dataCount,&dataMatrixDimension, sudokuArray, sud) ;
+    initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
 
     // Free temporary variables; converted into struct sudoku
 
