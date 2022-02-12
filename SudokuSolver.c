@@ -21,6 +21,24 @@ struct sudoku{
     int colLength;
     int **dataMatrix;
     };
+
+
+int readMatrix(int **matrix, int rowLength, int colLength)
+{
+    for (int row = 0; row < (rowLength); row++)
+    {
+        printf("|");
+       for (int col = 0; col < (colLength); col++)
+        {
+            printf("%d|", matrix[row][col]);
+        }
+        printf("\n"); 
+    }
+
+    return 0;
+}
+
+
 void *saferCalloc(int numOfElements, int sizeOf)
 {
     void *memoryAddress = calloc(numOfElements,sizeOf);
@@ -31,7 +49,7 @@ void *saferCalloc(int numOfElements, int sizeOf)
     }
     return memoryAddress;
 }
-int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataDimension, int datacount){
+int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension, int datacount){
     int row, col;
     row = col = 0;
     for (int i = 0; i < datacount; i++)
@@ -47,7 +65,7 @@ int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataD
     }
     return 0;
 }
-int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct sudoku *sud)
+int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
     // assign one-dimensional attributes
     sud->size = *size;
@@ -63,21 +81,11 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->dataMatrix = matrix;
-    // TODO: Refactor readMatrix
-    for (int row = 0; row < (sud->colLength); row++)
-    {
-        printf("|");
-        for (int col = 0; col < (sud->colLength); col++)
-        {
-            printf("%d|", sud->dataMatrix[row][col]);
-        }
-        printf("\n"); 
-    }
-
+    readMatrix(sud->dataMatrix, sud->rowLength, sud->colLength);
     return 0;
 }
 
-int readFile(char filename[], int *dataCount, int sudokuArray[], int *dataMatrixDimension)
+int readFile(char filename[], int *dataCount, int *sudokuArray, int *dataMatrixDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
