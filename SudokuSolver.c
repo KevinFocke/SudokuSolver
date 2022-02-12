@@ -49,6 +49,7 @@ void *saferCalloc(int numOfElements, int sizeOf)
     }
     return memoryAddress;
 }
+
 int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension, int datacount){
     int row, col;
     row = col = 0;
