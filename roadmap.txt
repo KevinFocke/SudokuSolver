@@ -2,12 +2,16 @@ Ver 1:
 x Create a program that solves simple sudokus inefficiently.
 x Refactor code into multiple subroutines
 x Can read in space-delimited text files.
+x Sudoku struct including 2D Matrix representation. 
+- Exit in case of error instead of return 1.
+- Create dataBlock structure (eg 3 x 3 block in a 9 x 9 matrix)
+- Refactor readMatrix into own function
 - Implement backtracking algorithm
 - Implement Databox structure
 - Can solve simple sudoku
 - Is extendible with different algorithms.
-- Check for memory leaks
 - Learn to bump history in Github, .gitignore
+
 
 Programmming goals:
 - Become more efficient with vim and more familiar with visual studio code.
@@ -17,7 +21,7 @@ Ver 2:
 - Add command line recognizition of filename=mytext.txt using fgets and regex
 https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
 - Increase portability by typedeffing eg. int becomes int 32
-
+- Check for memory leaks (valgrind), replace malloc with calloc
 
 
 Programming goals:

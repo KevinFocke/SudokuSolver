@@ -1,5 +1,5 @@
 
-// Super Sudoku Solver
+// Sudoku Solver
 
 // Header
 
@@ -17,23 +17,66 @@ const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of m
 // Sudoku is represented as a matrix
 struct sudoku{
     int size;
-    int rowlength;
-    int collength;
-    int *matrix2D[MAXARRAY];
+    int rowLength;
+    int colLength;
+    int **dataMatrix;
     };
 
-int readFile(char filename[], int *numbercount, int sudoku_array[], int *dataMatrixDimension)
+int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataDimension, int datacount){
+    int row, col;
+    row = col = 0;
+    for (int i = 0; i < datacount; i++)
+    {
+        if (i % (dataDimension) == 0 && i != 0) // problem: i = 0 also counts as 0.
+        {
+            row += 1;
+            col = 0;
+        }
+        col += 1;
+        // printf("\n i = %d, modulo = %d, datadimension = %d; row = %d, col = %d, onedimensional = %d", i, i % (dataDimension), dataDimension, row, col, onedimensional[i]);
+        matrix[row][col] = onedimensional[i];
+    }
+    return 0;
+}
+int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct sudoku *sud)
+{
+    // assign one-dimensional attributes
+    sud->size = *size;
+    sud->rowLength = sud->colLength = *dataDimension; // square hence same length and width
+    // initialize Matrix via array of pointers to arrays
+    int rowcount = *dataDimension;
+    int colcount = *dataDimension;
+    int **matrix = calloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
+    for (int i = 0; i < rowcount; i++) {
+        matrix[i] = calloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+    }
+    convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
+    printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
+    printf("Sudoku Matrix: \n");
+    sud->dataMatrix = matrix;
+    // TODO: Refactor readMatrix
+    for (int row = 0; row < (sud->colLength); row++)
+    {
+        printf("|");
+        for (int col = 0; col < (sud->colLength); col++)
+        {
+            printf("%d|", sud->dataMatrix[row][col]);
+        }
+        printf("\n"); 
+    }
+    return 0;
+}
+
+int readFile(char filename[], int *dataCount, int sudokuArray[], int *dataMatrixDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
     FILE *fp;
-    printf("%s", filename);
     fp = fopen(filename, "r");
 
 
-    *numbercount = 0;
-    printf("Initializing Max Sudoku array.");
-    printf("scanning %s\n", filename);
+    *dataCount = 0;
+    printf("Scanning %s\n", filename);
     // TODO : Detect non-numeric characters
     int buffer = 0;
     while (fscanf(fp, "%d", &buffer) != EOF){
@@ -41,62 +84,58 @@ int readFile(char filename[], int *numbercount, int sudoku_array[], int *dataMat
             printf("\n Detected negative number. Exiting program.");
             return 1;
             }
-        sudoku_array[*numbercount] = buffer; // put current int in array
-        *numbercount += 1;
-    }
-
-    printf("Scan results: \n");
-    for (int i= 0; i < *numbercount; i++)
-    {
-    printf("%d", sudoku_array[i]);    
+        sudokuArray[*dataCount] = buffer; // put current int in array
+        *dataCount += 1;
     }
 
     for (int i = 1; i <= MAXDIMENSION; i++)
     {
-        if (*numbercount == i * i)
+        if (*dataCount == i * i)
         {
             *dataMatrixDimension = i;
-            printf("\nThe data dimension is %d x %d \n", *dataMatrixDimension, *dataMatrixDimension);
             break;
         }
     }
 
     if (*dataMatrixDimension == 0)
     {
-        printf("\n Invalid numbercount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*numbercount,MAXDIMENSION);
+        printf("\n Invalid dataCount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*dataCount,MAXDIMENSION);
         return 1;
     }
-    
-    printf("\nCounted %d numbers \n", *numbercount);
 
     return 0;
 }
 
 // TODO: Create a seperate function for reading in file
 int main(void){
-    //TODO: Enabling queuing sudokus
+    //TODO: Enable queuing sudokus
     // Init vars
     char filename[] = "sudoku_input.txt";
-    int numbercount = 0;
-    int dataMatrixDimension = 0;
-    struct sudoku sud;
-    // Initialize the maximum possible sudoku array
-    int sudoku_array[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
+    int dataCount;
+    int dataMatrixDimension;
+    // Initialize the maximum possible sudoku array; one-dimensional
+    int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
     for (int i = 0; i < MAXARRAY; i++)
     {
-        sudoku_array[i] = -1; 
+        sudokuArray[i] = -1; 
     }
 
     //Function calls
-    if (readFile(filename, &numbercount, sudoku_array, &dataMatrixDimension))
+    if (readFile(filename, &dataCount, sudokuArray, &dataMatrixDimension))
     {
         return 1;
     }
+    
+    // Convert one-dimensional temporary array to 2D matrix in sudoku struct
+    struct sudoku sud;
+    initSudoku(&dataCount,&dataMatrixDimension, &sudokuArray, &sud) ;
+    free(sudokuArray);
+    
+    
+    // We have a singular array, gets searched through pointers.
 
-    // Set sudoku
-    sud.size = numbercount;
-    sud.collength = sud.rowlength = MAXDIMENSION; //square dimensions
 
+    // TODO: Figure out optimal data representation. matrix? row? col? dataBox?
 
 
     // Argument: struct sudoku *sud
