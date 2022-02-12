@@ -22,6 +22,15 @@ struct sudoku{
     int **dataMatrix;
     };
 
+int checkCalloc(void *memoryAddress)
+{
+    if (memoryAddress == NULL) // Check pointer
+    {
+        printf("Calloc failed. Terminating program.");
+        exit(1);
+    }
+    return 0;
+}
 int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataDimension, int datacount){
     int row, col;
     row = col = 0;
@@ -47,8 +56,10 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
     int **matrix = calloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
+    checkCalloc(matrix);
     for (int i = 0; i < rowcount; i++) {
         matrix[i] = calloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+        checkCalloc(matrix[i]);
     }
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
