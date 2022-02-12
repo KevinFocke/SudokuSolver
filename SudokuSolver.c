@@ -21,15 +21,15 @@ struct sudoku{
     int colLength;
     int **dataMatrix;
     };
-
-int checkCalloc(void *memoryAddress)
+void *saferCalloc(int numOfElements, int sizeOf)
 {
+    void *memoryAddress = calloc(numOfElements,sizeOf);
     if (memoryAddress == NULL) // Check pointer
     {
         printf("Calloc failed. Terminating program.");
         exit(1);
     }
-    return 0;
+    return memoryAddress;
 }
 int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataDimension, int datacount){
     int row, col;
@@ -55,11 +55,9 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
     // initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
-    int **matrix = calloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
-    checkCalloc(matrix);
+    int **matrix = saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
     for (int i = 0; i < rowcount; i++) {
-        matrix[i] = calloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
-        checkCalloc(matrix[i]);
+        matrix[i] = saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
@@ -141,22 +139,12 @@ int main(void){
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku sud;
-    initSudoku(&dataCount,&dataMatrixDimension, &sudokuArray, &sud) ;
+    initSudoku(&dataCount,&dataMatrixDimension, sudokuArray, &sud) ;
 
     // Free temporary variables; converted into struct sudoku
     free(sudokuArray);
     free(dataCount);
     free(dataMatrixDimension);
-    
-    
-    // We have a singular array, gets searched through pointers.
-
-
-    // TODO: Figure out optimal data representation. matrix? row? col? dataBox?
-
-
-    // Argument: struct sudoku *sud
-    // Count the size of the input. Does it match known dimensions?
 
 
     // TODO: Free Malloc
@@ -165,13 +153,6 @@ int main(void){
     // implement vertical line checker
     // implement horizontal line checker
     // implement box line checker
-
-
-    /* TODO: Refactor into subroutines
-    readData();
-    makeSudoku(DataMatrixDimension, );
-    solveSudoku();
-    */
 
 
     return 0; // main finished succesfully 
