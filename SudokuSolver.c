@@ -9,19 +9,19 @@
 #include <regex.h>
 #include <stdlib.h>
 
-// Supported sudoku is 9 x 9
+// Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
 #define MAX(A,B) ((A)>(B))?(A):(B);
 // Sudoku is represented as a matrix
-struct sudoku{
+struct sudoku
+    {
     int size;
     int rowLength;
     int colLength;
     int **dataMatrix;
     };
-
 
 int readMatrix(int **matrix, int rowLength, int colLength)
 {
@@ -34,10 +34,8 @@ int readMatrix(int **matrix, int rowLength, int colLength)
         }
         printf("\n"); 
     }
-
     return 0;
 }
-
 
 void *saferCalloc(int numOfElements, int sizeOf)
 {
@@ -66,6 +64,7 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     }
     return 0;
 }
+
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
     // assign one-dimensional attributes
@@ -86,7 +85,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char filename[], int *dataCount, int *sudokuArray, int *dataMatrixDimension)
+int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataMatrixDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
@@ -125,7 +124,6 @@ int readFile(char filename[], int *dataCount, int *sudokuArray, int *dataMatrixD
     return 0;
 }
 
-// TODO: Create a seperate function for reading in file
 int main(void){
     //TODO: Enable queuing sudokus
     // Init vars

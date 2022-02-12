@@ -60,3 +60,6 @@ Lessons learned:
 
 - Be more consistent with casing. CAPITALS for globals. camelCase for local vars.
 - Be more granular with commits. One thing at a time.
+
+There has to be an easier way to delete THIS:
+(int arg1, int arg2, int THIS);
