@@ -54,7 +54,7 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->dataMatrix = matrix;
-    // TODO: Refactor readMatrix
+    // TODO: Refactor readMatrin
     for (int row = 0; row < (sud->colLength); row++)
     {
         printf("|");
@@ -81,8 +81,8 @@ int readFile(char filename[], int *dataCount, int sudokuArray[], int *dataMatrix
     int buffer = 0;
     while (fscanf(fp, "%d", &buffer) != EOF){
     if (buffer < 0){
-            printf("\n Detected negative number. Exiting program.");
-            return 1;
+            printf("\n Detected negative number.");
+            exit(1);
             }
         sudokuArray[*dataCount] = buffer; // put current int in array
         *dataCount += 1;
@@ -100,7 +100,7 @@ int readFile(char filename[], int *dataCount, int sudokuArray[], int *dataMatrix
     if (*dataMatrixDimension == 0)
     {
         printf("\n Invalid dataCount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*dataCount,MAXDIMENSION);
-        return 1;
+        exit(1);
     }
 
     return 0;
@@ -123,7 +123,8 @@ int main(void){
     //Function calls
     if (readFile(filename, &dataCount, sudokuArray, &dataMatrixDimension))
     {
-        return 1;
+        printf("Failed to read file.");
+        exit(1);
     }
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
