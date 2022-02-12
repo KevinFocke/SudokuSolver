@@ -32,9 +32,9 @@ int convertArrayDimension(int onedimensional[MAXARRAY],  int **matrix, int dataD
             row += 1;
             col = 0;
         }
+        matrix[row][col] = onedimensional[i];
         col += 1;
         // printf("\n i = %d, modulo = %d, datadimension = %d; row = %d, col = %d, onedimensional = %d", i, i % (dataDimension), dataDimension, row, col, onedimensional[i]);
-        matrix[row][col] = onedimensional[i];
     }
     return 0;
 }
@@ -54,7 +54,7 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->dataMatrix = matrix;
-    // TODO: Refactor readMatrin
+    // TODO: Refactor readMatrix
     for (int row = 0; row < (sud->colLength); row++)
     {
         printf("|");
@@ -64,6 +64,7 @@ int initSudoku(int *size, int *dataDimension, int sudokuArray[MAXARRAY],  struct
         }
         printf("\n"); 
     }
+
     return 0;
 }
 
@@ -130,7 +131,11 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku sud;
     initSudoku(&dataCount,&dataMatrixDimension, &sudokuArray, &sud) ;
+
+    // Free temporary variables; converted into struct sudoku
     free(sudokuArray);
+    free(dataCount);
+    free(dataMatrixDimension);
     
     
     // We have a singular array, gets searched through pointers.
