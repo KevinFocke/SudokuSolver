@@ -7,7 +7,6 @@ x Exit in case of error instead of return 1.
 - Create dataBlock structure (eg 3 x 3 block in a 9 x 9 matrix)
 x Refactor readMatrix into own function
 - Implement backtracking algorithm
-- Implement Databox structure
 - Can solve simple sudoku
 - Is extendible with different algorithms.
 - Learn to bump history in Github, .gitignore

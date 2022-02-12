@@ -1,8 +1,5 @@
 
 // Sudoku Solver
-
-// Header
-
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
@@ -13,8 +10,7 @@
 const int MAXDIMENSION = 9; // Max dimension of sudoku
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
-#define MAX(A,B) ((A)>(B))?(A):(B);
-// Sudoku is represented as a matrix
+// Sudoku is represented as a 2D matrix
 struct sudoku
     {
     int size;
@@ -23,7 +19,9 @@ struct sudoku
     int **dataMatrix;
     };
 
-int readMatrix(int **matrix, int rowLength, int colLength)
+
+
+int printMatrix(int **matrix, int rowLength, int colLength)
 {
     for (int row = 0; row < (rowLength); row++)
     {
@@ -73,15 +71,15 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     // initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
-    int **matrix = saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
-    for (int i = 0; i < rowcount; i++) {
-        matrix[i] = saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+    int **matrix = (int **)saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
+    for (int pointer = 0; pointer < rowcount; pointer++) {
+        matrix[pointer] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->dataMatrix = matrix;
-    readMatrix(sud->dataMatrix, sud->rowLength, sud->colLength);
+    printMatrix(sud->dataMatrix, sud->rowLength, sud->colLength);
     return 0;
 }
 
@@ -124,10 +122,25 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataMatrixDi
     return 0;
 }
 
+int solveSudoku()
+{return 0;}
+
+int outputSudoku()
+{
+    // print
+
+    // save to disk
+    
+     
+    return 0;}
+
 int main(void){
     //TODO: Enable queuing sudokus
     // Init vars
     char filename[] = "sudoku_input.txt";
+    
+    // Process per Sudoku
+
     int dataCount;
     int dataMatrixDimension;
     // Initialize the maximum possible sudoku array; one-dimensional
@@ -145,18 +158,18 @@ int main(void){
     }
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
-    struct sudoku sud;
-    initSudoku(&dataCount,&dataMatrixDimension, sudokuArray, &sud) ;
+    struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
+    initSudoku(&dataCount,&dataMatrixDimension, sudokuArray, sud) ;
 
     // Free temporary variables; converted into struct sudoku
-    free(sudokuArray);
-    free(dataCount);
-    free(dataMatrixDimension);
 
-
+    // solveSudoku
+    // printSudoku
     // TODO: Free Malloc
-
-
+    solveSudoku();
+    outputSudoku();
+    free(sud);
+    
     // implement vertical line checker
     // implement horizontal line checker
     // implement box line checker
