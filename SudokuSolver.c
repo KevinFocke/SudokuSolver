@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <math.h>
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
@@ -14,15 +15,15 @@ struct sudoku
     int size;
     int rowLength;
     int colLength;
-    int **matrix; // 2D matrix (list of pointers to arrays containing digits)
-    int **box; // list of pointers to Boxes
+    int **matrix; // 2D matrix, list of pointers to arrays containing digits
+    int **boxList; // list of pointers to Boxes, filling from top-left to right;
 };
 
 
 struct box
 {
     int unsolvedCount; // How many elements are currently unsolved?
-    int **boxMatrix; // (list of pointers to arrays containing pointers)
+    int **pointerMatrix; // (list of pointers to arrays containing pointers)
 };
 
 int printMatrix(int **matrix, int rowLength, int colLength)
@@ -67,6 +68,63 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     return 0;
 }
 
+int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int boxPosHorizontal)
+{
+    /* Terminology: boxPos refer to the position of the box within the matrix.
+    Needed for initializing pointers to elements.
+    
+    a 9 x 9 Matrix will have 9 boxes:
+    B B B
+    B B B   (the first B in this row has boxPosVertical 1, boxPosHorizontal 0)
+    B B B
+
+    boxRow & boxCol refer to the cols and row INSIDE a box.
+
+    Delving into box:
+    sud->boxList[1][0]->boxMatrix:
+    P P P
+    P P P
+    P P P
+    */
+
+
+    return 0;
+}
+
+int initBoxList(int dataDimension, struct sudoku *sud)
+{  
+    int boxWidth = floor(sqrt((double) dataDimension));
+    if ((boxWidth * boxWidth) != dataDimension)
+    {
+        printf("BoxWidth sqrt flooring failed to produce round number.");
+        exit (1);
+    }
+    
+    //printf("\n dataDimension is %d, Boxwidth is:%d",dataDimension, boxWidth);
+
+    // Init boxList
+    struct box**boxList = (struct box**)saferCalloc(boxWidth, sizeof(struct box*)); 
+    for (int pointerCount = 0; pointerCount < boxWidth; pointerCount++) // create boxList and assign pointer to a struct box
+    {
+        boxList[pointerCount] = (struct box*)saferCalloc(boxWidth, sizeof(struct box));
+    }
+
+    for (int row = 0; row < boxWidth; row++)
+    {
+        for (int col = 0; col < boxWidth; col++)
+        {
+        struct box boxTemp;
+        boxList[row][col] = boxTemp;
+        }
+    }
+
+
+
+
+    return 0;
+
+
+}
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
     // assign one-dimensional attributes
@@ -76,14 +134,21 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
     int **matrix = (int **)saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
-    for (int pointer = 0; pointer < rowcount; pointer++) {
-        matrix[pointer] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+    for (int pointerCount = 0; pointerCount < rowcount; pointerCount++) {
+        matrix[pointerCount] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->matrix = matrix;
     printMatrix(sud->matrix, sud->rowLength, sud->colLength);
+
+    // Init boxStructure
+    initBoxList(*dataDimension, sud);
+
+    // Calculate required length
+    
+
     return 0;
 }
 

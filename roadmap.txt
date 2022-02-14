@@ -4,7 +4,7 @@ x Refactor code into multiple subroutines
 x Can read in space-delimited text files.
 x Sudoku struct including 2D Matrix representation. 
 x Exit in case of error instead of return 1.
-- Initialize a dataBlock structure (eg 3 x 3 block in a 9 x 9 matrix)
+- Initialize a box structure (eg 3 x 3 box in a 9 x 9 matrix)
 x Refactor readMatrix into own function
 - Implement backtracking algorithm
 - Can solve simple sudoku
