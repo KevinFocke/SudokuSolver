@@ -18,6 +18,7 @@ struct sudoku
     int colLength;
     int boxWidth; // Not compatible with snake matrix
     int totalUnsolved;
+    int initialUnsolved;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
 };
@@ -255,7 +256,7 @@ int checkBox(struct sudoku *sud, int number, int row, int col)
 
 int solveSudoku(struct sudoku *sud)
 {
-    // keep track of: steps taken, cycles taken
+    // Count unsolved entries
     int totalUnsolved = 0;
     for(int row = 0; row < sud->boxWidth; row++)
     {
@@ -266,6 +267,7 @@ int solveSudoku(struct sudoku *sud)
     
     }
     sud->totalUnsolved = totalUnsolved;
+    sud->initialUnsolved = totalUnsolved;
     
     // Check each number
     for (int row = 0; row < sud->rowLength; row++)
@@ -299,7 +301,8 @@ int outputSudoku(struct sudoku *sud)
     }
     else
     {
-        printf("Solution not found. Total unsolved: %i", sud->totalUnsolved);
+        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", (sud->totalUnsolved) - (sud->totalUnsolved), sud->initialUnsolved);
+        printMatrix(sud->matrix,sud->rowLength,sud->colLength); 
     }
 
     // save to disk
