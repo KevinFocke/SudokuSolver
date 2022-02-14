@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
@@ -217,20 +218,22 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimens
     return 0;
 }
 
-int checkRow(struct sudoku *sud, int number, int row, int col)
+int checkLine(struct sudoku *sud, int number, int matrixrow, int matrixcol, char *mode) // to avoid WET, reuse function
 {
+    // Implement a case switch depending on the mode, r = row mode, c = col mode
+    char *modeDefault = "r";
+    strcmp(mode,modeDefault) != 0; // Value != 0 means string is different; not a row.
+
+    // TODO, init variables to make the loop mode-agnostic.
+
+
     for (int searchCol = 0; searchCol < sud->colLength; searchCol++)
     {
-        if (sud->matrix[row][col] == number)
+        if (sud->matrix[matrixrow][matrixcol] == number)
         {
             // Del from possibility list; the same number cannot appear twice
         }
     }
-    return 0;
-}
-
-int checkCol(struct sudoku *sud, int number, int row, int col)
-{
     return 0;
 }
 
@@ -260,8 +263,8 @@ int solveSudoku(struct sudoku *sud)
         {
             for (int number = 1; number <= sud->rowLength; number++)
             {   // For every row & col, check whether number appears in other place than itself
-                checkRow(sud, number, row, col);
-                checkCol(sud, number, row, col);
+                checkLine(sud, number, row, col, "row");
+                checkLine(sud, number, row, col, "column");
                 checkBox(sud, number, row, col); // remember: Potential bug in pointer arithmetic
             }
         }
