@@ -217,21 +217,25 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimens
     return 0;
 }
 
-int checkRow()
+int checkRow(struct sudoku *sud, int number, int row, int col)
 {
-    
+    for (int searchCol = 0; searchCol < sud->colLength; searchCol++)
+    {
+        if (sud->matrix[row][col] == number)
+        {
+            // Del from possibility list; the same number cannot appear twice
+        }
+    }
     return 0;
 }
 
-int checkCol()
+int checkCol(struct sudoku *sud, int number, int row, int col)
 {
-
     return 0;
 }
 
-int checkBox()
+int checkBox(struct sudoku *sud, int number, int row, int col)
 {
-
     return 0;
 }
 
@@ -248,11 +252,19 @@ int solveSudoku(struct sudoku *sud)
     
     }
     sud->totalUnsolved = totalUnsolved;
-    for (int number = 1; number <= sud->rowLength; number++)
+    
+    // Check each number
+    for (int row = 0; row < sud->rowLength; row++)
     {
-        checkRow();
-        checkCol();
-        checkBox(); // remember: Potential bug in pointer arithmetic
+        for (int col = 0; col < sud->colLength; col++)
+        {
+            for (int number = 1; number <= sud->rowLength; number++)
+            {   // For every row & col, check whether number appears in other place than itself
+                checkRow(sud, number, row, col);
+                checkCol(sud, number, row, col);
+                checkBox(sud, number, row, col); // remember: Potential bug in pointer arithmetic
+            }
+        }
     }
 
     /*while (sud->totalUnsolved > 0){
@@ -280,10 +292,11 @@ int outputSudoku(struct sudoku *sud)
 
 
     return 0;}
+
 int main(void){
     //TODO: Enable queuing sudokus
     // Init vars
-    char filename[] = "sudoku_input.txt";
+    char filename[] = "sudoku_input_simple.txt";
     
     // Process per Sudoku
 
