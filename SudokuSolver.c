@@ -244,8 +244,8 @@ int checkLine(struct sudoku *sud, int number, int matrixrow, int matrixcol, int 
         {
             // Del from possibility list; the same number cannot appear twice
         }
-    }
-    return 0;*/
+    }*/
+    return 0;
 }
 
 int checkBox(struct sudoku *sud, int number, int row, int col)
@@ -274,8 +274,8 @@ int solveSudoku(struct sudoku *sud)
         {
             for (int number = 1; number <= sud->rowLength; number++)
             {   // For every row & col, check whether number appears in other place than itself
-                checkLine(sud, number, row, col, "row");
-                checkLine(sud, number, row, col, "column");
+                checkLine(sud, number, row, col, 0);
+                checkLine(sud, number, row, col, 1);
                 checkBox(sud, number, row, col); // remember: Potential bug in pointer arithmetic
             }
         }
