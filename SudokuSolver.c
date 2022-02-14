@@ -218,23 +218,34 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimens
     return 0;
 }
 
-int checkLine(struct sudoku *sud, int number, int matrixrow, int matrixcol, char *mode) // to avoid WET, reuse function
+int checkLine(struct sudoku *sud, int number, int matrixrow, int matrixcol, int mode) // to avoid WET, reuse function for both row and col
 {
-    // Implement a case switch depending on the mode, r = row mode, c = col mode
-    char *modeDefault = "r";
-    strcmp(mode,modeDefault) != 0; // Value != 0 means string is different; not a row.
+    // Mode: '0' means rows are checked, '1' means cols are checked
 
     // TODO, init variables to make the loop mode-agnostic.
+    if (mode == 0) // row mode
+    {
+        // init variables for loop
+    }
+    else if (mode == 1) // col mode
+    {
+        // init variables for loop
+    }
+    else
+    {
+        printf("checkLine mode not recognized.");
+        exit(1);
+    }
 
 
-    for (int searchCol = 0; searchCol < sud->colLength; searchCol++)
+    /*for (int searchCol = 0; searchCol < sud->colLength; searchCol++)
     {
         if (sud->matrix[matrixrow][matrixcol] == number)
         {
             // Del from possibility list; the same number cannot appear twice
         }
     }
-    return 0;
+    return 0;*/
 }
 
 int checkBox(struct sudoku *sud, int number, int row, int col)
