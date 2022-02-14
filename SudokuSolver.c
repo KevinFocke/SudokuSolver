@@ -16,14 +16,14 @@ struct sudoku
     int rowLength;
     int colLength;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
-    int ***boxList; // list of pointers to Boxes, filling from top-left to right;
+    int **boxList; // list of pointers to Boxes, filling from top-left to right;
 };
 
 
 struct box
 {
     int unsolvedCount; // How many elements are currently unsolved?
-    int **pointerMatrix; // (list of pointers to arrays containing pointers)
+    int ***pointerMatrix; // (list of pointers to arrays containing pointers)
 };
 
 int printMatrix(int **matrix, int rowLength, int colLength)
@@ -96,14 +96,13 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
    {
        for (int col = 0; col < boxWidth; col++)
        {
-           
-           tempBoxMatrix[row][col] = &(sud->matrix[row*(boxPosVertical+1)][col*(boxPosHorizontal+1)]);
-           //printf("Integer: %i \n", *(tempBoxMatrix[row][col]));
+           tempBoxMatrix[row][col] = &(sud->matrix[row+(boxPosVertical*3)][col+(boxPosHorizontal*3)]);
+           printf("%i", *(tempBoxMatrix[row][col]));
        }
+       printf("\n");
    }
-    sud->boxList[boxPosVertical][boxPosHorizontal] = tempBoxMatrix;
-    printf("%i", sud->boxList[0][1]);
-
+    printf("-\n");
+    box->pointerMatrix = tempBoxMatrix;
 
     return 0;
 }
@@ -135,7 +134,8 @@ int initBoxList(int dataDimension, struct sudoku *sud)
         boxList[row][col] = boxTemp;
         }
     }
-    printf("boxList[0][0] = %i", boxList[0][1].unsolvedCount);
+
+    // printf("boxList[0][1] = %i", *(boxList[2][2].pointerMatrix[1][1]));
 
 
 
