@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <conio.h> 
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
+const int MAXITERATIONS = 81;
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
 // Sudoku is represented as a 2D matrix
@@ -32,7 +34,7 @@ struct box
     int ***pointerMatrix; // (list of pointers to arrays containing pointers)
 };
 
-int printMatrix(int **matrix, int rowLength, int colLength)
+int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
     for (int row = 0; row < (rowLength); row++)
     {
@@ -173,7 +175,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     sud->matrix = matrix;
-    printMatrix(sud->matrix, sud->rowLength, sud->colLength);
+    printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
     initBoxList(*dataDimension, sud);
 
@@ -219,42 +221,53 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimens
     return 0;
 }
 
-int checkLine(struct sudoku *sud, int number, int matrixrow, int matrixcol, int mode) // to avoid WET, reuse function for both row and col
+int checkRow(struct sudoku *sud, int number, int matrixRow)
 {
-    // Mode: '0' means rows are checked, '1' means cols are checked
+   /* If you check row, the row is fixed, col variablet & vice versa. */ 
 
-    // TODO, init variables to make the loop mode-agnostic.
-    if (mode == 0) // row mode
+    for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
     {
-        // init variables for loop
-    }
-    else if (mode == 1) // col mode
-    {
-        // init variables for loop
-    }
-    else
-    {
-        printf("checkLine mode not recognized.");
-        exit(1);
-    }
-
-
-    /*for (int searchCol = 0; searchCol < sud->colLength; searchCol++)
-    {
-        if (sud->matrix[matrixrow][matrixcol] == number)
+        if (sud->matrix[matrixRow][varDimension] == number)
         {
-            // Del from possibility list; the same number cannot appear twice
+            return 1; // Found matching number
         }
-    }*/
-    return 0;
+    }
+
+    return 0; // No result found
 }
 
-int checkBox(struct sudoku *sud, int number, int row, int col)
+int checkCol(struct sudoku *sud, int number, int matrixCol)
 {
-    return 0;
+   /* If you check row, the row is fixed, col variablet & vice versa. */ 
+
+    for (int varDimension = 0; varDimension < sud->rowLength; varDimension++) // iterate over rows
+    {
+        if (sud->matrix[varDimension][matrixCol] == number)
+        {
+            return 1; // Found matching number
+        }
+    }
+
+    return 0; // No result found
 }
 
-int solveSudoku(struct sudoku *sud)
+int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
+{
+    for (int row = 0; row < verticalBound; row ++)
+    {
+        for (int col = 0; col < horizontalBound; col++)
+        {
+            
+            if (*(sud->boxList[currentBoxVertical][currentBoxHorizontal].pointerMatrix[row][col]) == number)
+            {
+                return 1; // found matching number
+            }
+        }
+    }
+    return 0; // found no match
+}
+
+int solveSudoku(struct sudoku *sud, int iterations)
 {
     // Count unsolved entries
     int totalUnsolved = 0;
@@ -270,23 +283,91 @@ int solveSudoku(struct sudoku *sud)
     sud->initialUnsolved = totalUnsolved;
     
     // Check each number
-    for (int row = 0; row < sud->rowLength; row++)
+    // NOT extendible to bigger sudokus or different formats; what if rowLength is largest dimension?
+    int boxHorizontalBound = floor(sqrt((double)sud->colLength));
+    int boxVerticalBound = floor(sqrt((double)sud->rowLength));
+    
+    for (int i = 0; i < iterations; i++)
     {
-        for (int col = 0; col < sud->colLength; col++)
+        int amountFoundInIteration = 0; // How many numbers were found this iteration?
+        printf("Current iteration: %i \n", i+1);
+    
+        int currentBoxHorizontal = 0;
+        int currentBoxVertical= 0;
+        for (int row = 0; row < sud->rowLength; row++)
         {
-            for (int number = 1; number <= sud->rowLength; number++)
-            {   // For every row & col, check whether number appears in other place than itself
-                checkLine(sud, number, row, col, 0);
-                checkLine(sud, number, row, col, 1);
-                checkBox(sud, number, row, col); // remember: Potential bug in pointer arithmetic
+            if (row != 0 && ((row % boxVerticalBound) == 0)) // Find out when box changes vertically
+            {
+                currentBoxVertical += 1;
+            }
+            // Keep track of horizontal box position
+            currentBoxHorizontal = 0; // reset current horizontal box at every new row
+
+
+            for (int col = 0; col < sud->colLength; col++) // iterate over cols
+            {
+            if (col != 0 && ((col % boxHorizontalBound) == 0)) // Find out when box changes horizontally
+            {
+                currentBoxHorizontal += 1;
+            }
+
+            // Allocate memory for possibilities & initialize max possibilites.
+            int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
+            int posCounter = sud->colLength; // How many possibilities are there?
+                for (int number = 1; number <= sud->rowLength; number++)
+                {   // For every row & col, check whether number appears in other place than itself
+                    if (sud->matrix[row][col] != 0)
+                    {
+                        break; // Already a value present
+                    }
+                    else if (checkRow(sud, number, row) == 1) // found matching number
+                    {
+                        posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
+                        posCounter -= 1;
+                        continue;
+                    }
+                    else if (checkCol(sud, number, col) == 1) // found mathcing number   
+                    {
+                        posArray[number] = MAXDIMENSION+1;
+                        posCounter -= 1;
+                        continue;
+                    }
+
+                    else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+                    {
+                        posArray[number] = MAXDIMENSION+1;
+                        posCounter -= 1;
+                        continue;
+                    } // remember: Potential bug in pointer arithmetic
+                }
+
+            // Check if there is a single solution possible: 
+            if (posCounter == 1)
+            {
+                for (int number = 1; number < sud->rowLength; number++) //check for every number
+                {
+                    if (posArray[number] == 0)
+                    {
+                        printf("Found number: %i at row %i col %i | ", number, row+1, col+1);
+                        sud->matrix[row][col] = number;
+                        printf("\n");
+                        printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
+                        amountFoundInIteration += 1;
+                        sud->totalUnsolved -= 1;
+                        break; // break the current loop
+                    }
+                }
+            }
+            free(posArray);
             }
         }
+    if (amountFoundInIteration == 0)
+    {
+        printf("Algorithm finds no more numbers. \n");
+        break;
     }
-
-    /*while (sud->totalUnsolved > 0){
-
-    }*/
-
+    printf("Amount of numbers found this iteration: %i \n", amountFoundInIteration);
+    }
 
 
     return 0;
@@ -297,12 +378,12 @@ int outputSudoku(struct sudoku *sud)
     if (sud->totalUnsolved == 0)
     {
     printf("\nSudoku Solved:\n");
-    printMatrix(sud->matrix,sud->rowLength,sud->colLength);
+    printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     }
     else
     {
-        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", (sud->totalUnsolved) - (sud->totalUnsolved), sud->initialUnsolved);
-        printMatrix(sud->matrix,sud->rowLength,sud->colLength); 
+        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", (sud->initialUnsolved) - (sud->totalUnsolved), sud->initialUnsolved);
+        printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
     }
 
     // save to disk
@@ -336,7 +417,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
-    solveSudoku(sud);
+    solveSudoku(sud, MAXITERATIONS);
     outputSudoku(sud);
     free(sud);
 
