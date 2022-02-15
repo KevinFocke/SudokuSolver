@@ -6,16 +6,29 @@ x Sudoku struct including 2D Matrix representation.
 x Exit in case of error instead of return 1.
 x Initialize a box structure (eg 3 x 3 box in a 9 x 9 matrix)
 x Refactor readMatrix into own function
-- Double check for pointer bug in box structure.
-- Can solve simple sudoku
+x Double check for pointer bug in box structure.
+x Can solve simple sudoku
 - Learn to bump history in Github, .gitignore
-
+x BUG: Does not find 9's
 
 Programmming goals:
 - Become more efficient with vim and more familiar with visual studio code.
 - Think about data representations and make sure the code is extendable.
 
 Ver 2: 
+- Solve cases with 2 or more possible fields 
+
+e.g.
+
+9 5 0 0 0 0 0 0 0
+7 0 0 4 0 0 0 0 0
+0 1 4 0 2 7 0 0 0
+0 4 0 0 0 1 6 8 0
+5 0 0 0 0 0 0 0 2
+0 7 6 8 0 0 0 4 0
+0 0 X 3 5 0 2 6 0       solution: X is 7
+0 0 0 0 0 0 0 1 9
+
 - To solve Sudoku, check diagonal instead of every row, every col.
 - Implement backtracking algorithm
 - Add command line recognizition of filename=mytext.txt using fgets and regex

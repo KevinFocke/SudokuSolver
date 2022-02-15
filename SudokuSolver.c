@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <conio.h> 
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
@@ -41,7 +43,14 @@ int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, in
         printf("|");
        for (int col = 0; col < (colLength); col++)
         {
+            if (highlightRow == row && highlightCol == col)
+            {
+                printf(ANSI_COLOR_RED "%d" ANSI_COLOR_RESET "|", matrix[row][col] );
+            }
+            else
+            {
             printf("%d|", matrix[row][col]);
+            }
         }
         printf("\n"); 
     }
@@ -253,12 +262,14 @@ int checkCol(struct sudoku *sud, int number, int matrixCol)
 
 int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
 {
+    int curValue = 0;
     for (int row = 0; row < verticalBound; row ++)
     {
         for (int col = 0; col < horizontalBound; col++)
         {
             
-            if (*(sud->boxList[currentBoxVertical][currentBoxHorizontal].pointerMatrix[row][col]) == number)
+            curValue = *(sud->boxList[currentBoxVertical][currentBoxHorizontal].pointerMatrix[row][col]);
+            if (curValue == number)
             {
                 return 1; // found matching number
             }
@@ -313,6 +324,7 @@ int solveSudoku(struct sudoku *sud, int iterations)
 
             // Allocate memory for possibilities & initialize max possibilites.
             int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
+            // TODO: Check the zero'th element of the posArray, can I make a speed improvement?
             int posCounter = sud->colLength; // How many possibilities are there?
                 for (int number = 1; number <= sud->rowLength; number++)
                 {   // For every row & col, check whether number appears in other place than itself
@@ -332,7 +344,6 @@ int solveSudoku(struct sudoku *sud, int iterations)
                         posCounter -= 1;
                         continue;
                     }
-
                     else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
                     {
                         posArray[number] = MAXDIMENSION+1;
@@ -344,7 +355,7 @@ int solveSudoku(struct sudoku *sud, int iterations)
             // Check if there is a single solution possible: 
             if (posCounter == 1)
             {
-                for (int number = 1; number < sud->rowLength; number++) //check for every number
+                for (int number = 1; number <= sud->rowLength; number++) //check for every number
                 {
                     if (posArray[number] == 0)
                     {
@@ -394,7 +405,7 @@ int outputSudoku(struct sudoku *sud)
 int main(void){
     //TODO: Enable queuing sudokus
     // Init vars
-    char filename[] = "sudoku_input_simple.txt";
+    char filename[] = "sudoku_input.txt";
     
     // Process per Sudoku
 
