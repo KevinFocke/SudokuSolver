@@ -10,14 +10,8 @@ x Double check for pointer bug in box structure.
 x Can solve simple sudoku
 x BUG: Does not find 9's
 
-Programmming goals:
-- Become more efficient with vim and more familiar with visual studio code.
-- Think about data representations and make sure the code is extendable.
-
 Ver 2: 
 x Make extendible with different algorithms.
-- Learn to bump history in Github, .gitignore
-https://github.com/semantic-release/semantic-release 
 - Solve cases with 2 or more possible fields 
 
 e.g.
@@ -31,16 +25,14 @@ e.g.
 0 0 X 3 5 0 2 6 0       solution: X is 7
 0 0 0 0 0 0 0 1 9
 
-- To solve Sudoku, check diagonal instead of every row, every col.
 - Implement backtracking algorithm
-- Add command line recognizition of filename=mytext.txt using fgets and regex
+- Add command line recognizition of flags, filename=mytext.txt 
+
+- Refactor input error detection; using fgets and regex
 https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
+
+- Allow queuing sudokus
 - Check for memory leaks (valgrind)
-
-
-Programming goals:
-- Start tracking changes with git
-- Become more efficient in compiling & running the code.
 
 Ver 3:
 - Add test cases
@@ -62,11 +54,6 @@ Ver 6:
 - Add photo mode, make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
 - Convert ints to a shorter type depending on needed number range?
-
-
-Programming goals:
-- Completely mouse-free coding.
-
 
 */
 

@@ -23,12 +23,13 @@ struct sudoku
     int boxWidth; // Not compatible with snake matrix
     int totalUnsolved;
     int initialUnsolved;
+    int numbersToFind;
+    int numbersFoundTotal;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
 };
 
 //BUG: Potential bug in **boxlist pointer logic
-
 
 struct box
 {
@@ -198,6 +199,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     // initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
+    sud ->numbersFoundTotal = 0;
     int **matrix = (int **)saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
     for (int i = 0; i < rowcount; i++) {
         matrix[i] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
@@ -301,51 +303,61 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     return 0; // found no match
 }
 
-int simpleAlgo(struct sudoku *sud, int *numbersFound)
+int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
     int boxHorizontalBound = floor(sqrt((double)sud->colLength));
     int boxVerticalBound = floor(sqrt((double)sud->rowLength));
     int currentBoxHorizontal = 0;
     int currentBoxVertical= 0;
+
+
     for (int row = 0; row < sud->rowLength; row++)
     {
-        if (row != 0 && ((row % boxVerticalBound) == 0)) // Find out when box changes vertically
+        // Track current box
+        if (row != 0 && ((row % boxVerticalBound) == 0))
         {
             currentBoxVertical += 1;
         }
-        // Keep track of horizontal box position
         currentBoxHorizontal = 0; // reset current horizontal box at every new row
-
-
-        for (int col = 0; col < sud->colLength; col++) // iterate over cols
+        for (int col = 0; col < sud->colLength; col++)
         {
         if (col != 0 && ((col % boxHorizontalBound) == 0)) // Find out when box changes horizontally
         {
             currentBoxHorizontal += 1;
         }
 
+
+        // Eliminate possibilities
+
         // Allocate memory for possibilities & initialize max possibilites.
         int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
-        // TODO: Check the zero'th element of the posArray, can I make a speed improvement?
+
         int posCounter = sud->colLength; // How many possibilities are there?
+
             for (int number = 1; number <= sud->rowLength; number++)
-            {   // For every row & col, check whether number appears in other place than itself
+            {   // For every row & col, check whether number appears
                 if (sud->matrix[row][col] != 0)
                 {
                     break; // Already a value present
                 }
-                else if (checkRow(sud, number, row) == 1) // found matching number
+
+                // Check the row
+                else if (checkRow(sud, number, row) == 1) // 
                 {
                     posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
                     posCounter -= 1;
                     continue;
                 }
+
+                // Check the col
                 else if (checkCol(sud, number, col) == 1) // found mathcing number   
                 {
                     posArray[number] = MAXDIMENSION+1;
                     posCounter -= 1;
                     continue;
                 }
+
+                // Check the box
                 else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
                 {
                     posArray[number] = MAXDIMENSION+1;
@@ -357,20 +369,28 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
         // Check if there is a single solution possible: 
         if (posCounter == 1)
         {
-            for (int number = 1; number <= sud->rowLength; number++) //check for every number
+            //Find the only possible number
+            for (int number = 1; number <= sud->rowLength; number++)
             {
                 if (posArray[number] == 0)
                 {
-                    printf("Found number: %i at row %i col %i | ", number, row+1, col+1);
+                    printf("Found number: %i at row %i col %i | ", number, row+1, col+1); // one-indexed print
                     sud->matrix[row][col] = number;
                     printf("\n");
                     printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
                     *numbersFound += 1;
+                    sud->numbersFoundTotal += 1;
                     sud->totalUnsolved -= 1;
-                    break; // break the current loop
+                    if (numbersToFind == sud->numbersFoundTotal)
+                    {
+                        return 0;
+                    }
+                    break;
                 }
             }
         }
+
+        // Reset the possibility array
         free(posArray);
         }
     }
@@ -378,22 +398,45 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
     return 0;
 }
 
-int solveSudoku(struct sudoku *sud, int iterations)
+int solveSudoku(struct sudoku *sud, int algoChoice, int iterations, int numbersToFind)
 {
+
+    /* Multiple algorithms are available for solving sudokus. 
     
-    // Check each number
-    // NOT extendible to bigger sudokus or different formats; what if rowLength is largest dimension?
+    The argument algoChoice refers to the chosen algorithm:
+
+    0 = Simple Method (check every row, col, box)
 
 
-     
+    */
+    int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo}; 
+
+    /*array of functions
+    
+    The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
+    Takes arguments:
+    - Struct sudoku
+    - State variable for how many numbers were found in iteration
+
+
+    */ 
+
     for (int i = 0; i < iterations; i++)
     {
         int numbersFound = 0; // How many numbers were found this iteration?
         printf("Current iteration: %i \n", i+1);
     
-    simpleAlgo(sud, &numbersFound);
 
-        
+    (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind);
+
+    if (numbersToFind == sud->numbersFoundTotal)
+    {
+        printf("\n Found %i numbers out of %i requested \n", sud->numbersFoundTotal, numbersToFind);
+        exit(0);
+    }
+
+    // TODO: Implement numbersToFind; 
+
     if (numbersFound == 0)
     {
         printf("Algorithm finds no more numbers. \n");
@@ -415,7 +458,7 @@ int outputSudoku(struct sudoku *sud)
     }
     else
     {
-        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", (sud->initialUnsolved) - (sud->totalUnsolved), sud->initialUnsolved);
+        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", sud->numbersFoundTotal, sud->initialUnsolved);
         printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
     }
 
@@ -426,6 +469,14 @@ int outputSudoku(struct sudoku *sud)
 
 int main(void){
     //TODO: Enable queuing sudokus
+    //TODO: add flag for algo choice & iterations
+
+    int algoChoice = 0; // Default algo is simple algo.
+    
+    int iterations = MAXDIMENSION * MAXDIMENSION; // default iterations
+    // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
+    int numbersToFind = 3;
+
     // Init vars
     char filename[] = "sudoku_input.txt";
     
@@ -450,7 +501,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
-    solveSudoku(sud, MAXDIMENSION * MAXDIMENSION);
+    solveSudoku(sud, algoChoice, iterations, numbersToFind);
     outputSudoku(sud);
     free(sud);
 
