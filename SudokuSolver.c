@@ -28,13 +28,6 @@ struct sudoku
     int numbersFoundTotal;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
-    bool ***possMatrix; // one-indexed to align with numbers; [row][col] value is 0 if number is free, 1 if taken. The first bool of the array is 1 if all poss are taken.
-};
-
-struct possMatrix
-{
-    bool ***possMatrix; 
-    int possibilities; 
 };
 
 struct box
@@ -195,17 +188,6 @@ int initBoxList(struct sudoku *sud, int dataDimension)
     return 0;
 }
 
-int initPossList(struct sudoku *sud, int dataDimension)
-{
-    int rowcount = dataDimension;
-    int colcount =dataDimension;
-    // Initialize the possibility matrix
-    int **possMatrix = (int**)saferCalloc(rowcount, sizeof(int*));
-    for (int i = 0; i < rowcount; i++)
-    {
-        possMatrix[i] = (int *)saferCalloc(colcount, sizeof(bool));
-    }
-}
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
     // assign one-dimensional attributes
