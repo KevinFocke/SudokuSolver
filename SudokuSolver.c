@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
@@ -27,9 +28,14 @@ struct sudoku
     int numbersFoundTotal;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
+    bool ***possMatrix; // one-indexed to align with numbers; [row][col] value is 0 if number is free, 1 if taken. The first bool of the array is 1 if all poss are taken.
 };
 
-//BUG: Potential bug in **boxlist pointer logic
+struct possMatrix
+{
+    bool ***possMatrix; 
+    int possibilities; 
+};
 
 struct box
 {
@@ -87,8 +93,6 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     }
     return 0;
 }
-
-
 
 int countUnsolved(struct sudoku *sud)
 {
@@ -156,7 +160,7 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     return 0;
 }
 
-int initBoxList(int dataDimension, struct sudoku *sud)
+int initBoxList(struct sudoku *sud, int dataDimension)
 {  
     int boxWidth = floor(sqrt((double) dataDimension));
     sud->boxWidth = boxWidth;
@@ -191,6 +195,17 @@ int initBoxList(int dataDimension, struct sudoku *sud)
     return 0;
 }
 
+int initPossList(struct sudoku *sud, int dataDimension)
+{
+    int rowcount = dataDimension;
+    int colcount =dataDimension;
+    // Initialize the possibility matrix
+    int **possMatrix = (int**)saferCalloc(rowcount, sizeof(int*));
+    for (int i = 0; i < rowcount; i++)
+    {
+        possMatrix[i] = (int *)saferCalloc(colcount, sizeof(bool));
+    }
+}
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
     // assign one-dimensional attributes
@@ -200,17 +215,20 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
     sud ->numbersFoundTotal = 0;
+    // Initialize the matrix
     int **matrix = (int **)saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
     for (int i = 0; i < rowcount; i++) {
         matrix[i] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
     convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
+
+    sud->matrix = matrix;
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
-    sud->matrix = matrix;
     printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
-    initBoxList(*dataDimension, sud);
+    initBoxList(sud, *dataDimension);
+    //initPossList(sud, *dataDimension);
     countUnsolved(sud); //how many entries unsolved?
 
     return 0;
@@ -302,6 +320,7 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     }
     return 0; // found no match
 }
+
 
 int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
@@ -398,7 +417,36 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     return 0;
 }
 
-int solveSudoku(struct sudoku *sud, int algoChoice, int iterations, int numbersToFind)
+int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
+{
+    /* base cases    
+    simpleSudoku returns 1; // 
+    simpleSudoku returns 0;
+
+    solveSudoku(sud, 1, )
+    */
+
+   // Step 1. Make a copy of the current sudoku
+
+   //struct sudoku *tempSud;
+   //tempSud = sud;
+
+   // Step 2. Fill in a random value out of the possibilities
+
+   // Step 3. Solve the tempSud using the simple method
+
+   /*Step 4. Was the sudoku fully solved? 
+   If yes, make tempSud the final sud
+   If no, throw away the tempSud, solve again using the backup sud
+   */
+
+   //
+
+
+
+    return 0;
+}
+int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind)
 {
 
     /* Multiple algorithms are available for solving sudokus. 
@@ -409,6 +457,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int iterations, int numbersT
 
 
     */
+
+    // Main algo method
     int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo}; 
 
     /*array of functions
@@ -421,12 +471,11 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int iterations, int numbersT
 
     */ 
 
-    for (int i = 0; i < iterations; i++)
+    for (int i = 0; i < *iterations; i++)
     {
         int numbersFound = 0; // How many numbers were found this iteration?
         printf("Current iteration: %i \n", i+1);
     
-
     (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind);
 
     if (numbersToFind == sud->numbersFoundTotal)
@@ -435,13 +484,12 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int iterations, int numbersT
         exit(0);
     }
 
-    // TODO: Implement numbersToFind; 
-
     if (numbersFound == 0)
     {
         printf("Algorithm finds no more numbers. \n");
-        break;
+        return 1;
     }
+
     printf("Amount of numbers found this iteration: %i \n", numbersFound);
     }
 
@@ -475,7 +523,7 @@ int main(void){
     
     int iterations = MAXDIMENSION * MAXDIMENSION; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
-    int numbersToFind = 3;
+    int numbersToFind = MAXDIMENSION*MAXDIMENSION;
 
     // Init vars
     char filename[] = "sudoku_input.txt";
@@ -501,7 +549,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
-    solveSudoku(sud, algoChoice, iterations, numbersToFind);
+    solveSudoku(sud, algoChoice, &iterations, numbersToFind);
     outputSudoku(sud);
     free(sud);
 

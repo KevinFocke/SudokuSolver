@@ -71,6 +71,7 @@ NORMAL pi( // paste inner bracket
 NORMAL vibp // replace inside brackets, goes to visual mode, selects inner brackets, pastes.
 NORMAL '' // go back to previous place.
 
+Pointers are fun and efficient, but don't overdo. If a pointer is accidentally changed (its value or reference) it can effect the WHOLE downstream.
 
 Reflect: 
 In checkRow & checkCol I wanted to use DRY programming, but found it difficult because you need to access the right element in the matrix. How could I have made it DRY??
