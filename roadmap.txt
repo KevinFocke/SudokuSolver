@@ -8,7 +8,6 @@ x Initialize a box structure (eg 3 x 3 box in a 9 x 9 matrix)
 x Refactor readMatrix into own function
 x Double check for pointer bug in box structure.
 x Can solve simple sudoku
-- Learn to bump history in Github, .gitignore
 x BUG: Does not find 9's
 
 Programmming goals:
@@ -16,6 +15,9 @@ Programmming goals:
 - Think about data representations and make sure the code is extendable.
 
 Ver 2: 
+x Make extendible with different algorithms.
+- Learn to bump history in Github, .gitignore
+https://github.com/semantic-release/semantic-release 
 - Solve cases with 2 or more possible fields 
 
 e.g.
@@ -33,7 +35,6 @@ e.g.
 - Implement backtracking algorithm
 - Add command line recognizition of filename=mytext.txt using fgets and regex
 https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
-- Is extendible with different algorithms.
 - Check for memory leaks (valgrind)
 
 

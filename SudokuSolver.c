@@ -34,6 +34,8 @@ struct box
 {
     int unsolvedCount; // How many elements are currently unsolved?
     int ***pointerMatrix; // (list of pointers to arrays containing pointers)
+    int boxHorizontalBound;
+    int boxVerticalBound;
 };
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
@@ -85,6 +87,25 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     return 0;
 }
 
+
+
+int countUnsolved(struct sudoku *sud)
+{
+    // Count unsolved entries
+    int totalUnsolved = 0;
+    for(int row = 0; row < sud->boxWidth; row++)
+    {
+        for (int col = 0; col < sud->boxWidth; col++)
+        {
+            totalUnsolved += sud->boxList[row][col].unsolvedCount;
+        }
+    
+    }
+    sud->totalUnsolved = totalUnsolved;
+    sud->initialUnsolved = totalUnsolved;
+    return 0;
+}
+
 int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int boxPosHorizontal, int boxWidth)
 {
     /* Terminology: boxPos refer to the position of the box within the matrix.
@@ -129,6 +150,7 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
    }
     box->pointerMatrix = tempBoxMatrix;
     box->unsolvedCount = tempUnsolved;
+    // TODO: Snake matrix, customize boxWidth
 
     return 0;
 }
@@ -187,6 +209,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
     initBoxList(*dataDimension, sud);
+    countUnsolved(sud); //how many entries unsolved?
 
     return 0;
 }
@@ -278,106 +301,105 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     return 0; // found no match
 }
 
+int simpleAlgo(struct sudoku *sud, int *numbersFound)
+{
+    int boxHorizontalBound = floor(sqrt((double)sud->colLength));
+    int boxVerticalBound = floor(sqrt((double)sud->rowLength));
+    int currentBoxHorizontal = 0;
+    int currentBoxVertical= 0;
+    for (int row = 0; row < sud->rowLength; row++)
+    {
+        if (row != 0 && ((row % boxVerticalBound) == 0)) // Find out when box changes vertically
+        {
+            currentBoxVertical += 1;
+        }
+        // Keep track of horizontal box position
+        currentBoxHorizontal = 0; // reset current horizontal box at every new row
+
+
+        for (int col = 0; col < sud->colLength; col++) // iterate over cols
+        {
+        if (col != 0 && ((col % boxHorizontalBound) == 0)) // Find out when box changes horizontally
+        {
+            currentBoxHorizontal += 1;
+        }
+
+        // Allocate memory for possibilities & initialize max possibilites.
+        int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
+        // TODO: Check the zero'th element of the posArray, can I make a speed improvement?
+        int posCounter = sud->colLength; // How many possibilities are there?
+            for (int number = 1; number <= sud->rowLength; number++)
+            {   // For every row & col, check whether number appears in other place than itself
+                if (sud->matrix[row][col] != 0)
+                {
+                    break; // Already a value present
+                }
+                else if (checkRow(sud, number, row) == 1) // found matching number
+                {
+                    posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
+                    posCounter -= 1;
+                    continue;
+                }
+                else if (checkCol(sud, number, col) == 1) // found mathcing number   
+                {
+                    posArray[number] = MAXDIMENSION+1;
+                    posCounter -= 1;
+                    continue;
+                }
+                else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+                {
+                    posArray[number] = MAXDIMENSION+1;
+                    posCounter -= 1;
+                    continue;
+                } // remember: Potential bug in pointer arithmetic
+            }
+
+        // Check if there is a single solution possible: 
+        if (posCounter == 1)
+        {
+            for (int number = 1; number <= sud->rowLength; number++) //check for every number
+            {
+                if (posArray[number] == 0)
+                {
+                    printf("Found number: %i at row %i col %i | ", number, row+1, col+1);
+                    sud->matrix[row][col] = number;
+                    printf("\n");
+                    printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
+                    *numbersFound += 1;
+                    sud->totalUnsolved -= 1;
+                    break; // break the current loop
+                }
+            }
+        }
+        free(posArray);
+        }
+    }
+    // Checks every row, col, and box redundantly.
+    return 0;
+}
+
 int solveSudoku(struct sudoku *sud, int iterations)
 {
-    // Count unsolved entries
-    int totalUnsolved = 0;
-    for(int row = 0; row < sud->boxWidth; row++)
-    {
-        for (int col = 0; col < sud->boxWidth; col++)
-        {
-            totalUnsolved += sud->boxList[row][col].unsolvedCount;
-        }
-    
-    }
-    sud->totalUnsolved = totalUnsolved;
-    sud->initialUnsolved = totalUnsolved;
     
     // Check each number
     // NOT extendible to bigger sudokus or different formats; what if rowLength is largest dimension?
-    int boxHorizontalBound = floor(sqrt((double)sud->colLength));
-    int boxVerticalBound = floor(sqrt((double)sud->rowLength));
-    
+
+
+     
     for (int i = 0; i < iterations; i++)
     {
-        int amountFoundInIteration = 0; // How many numbers were found this iteration?
+        int numbersFound = 0; // How many numbers were found this iteration?
         printf("Current iteration: %i \n", i+1);
     
-        int currentBoxHorizontal = 0;
-        int currentBoxVertical= 0;
-        for (int row = 0; row < sud->rowLength; row++)
-        {
-            if (row != 0 && ((row % boxVerticalBound) == 0)) // Find out when box changes vertically
-            {
-                currentBoxVertical += 1;
-            }
-            // Keep track of horizontal box position
-            currentBoxHorizontal = 0; // reset current horizontal box at every new row
+    simpleAlgo(sud, &numbersFound);
 
-
-            for (int col = 0; col < sud->colLength; col++) // iterate over cols
-            {
-            if (col != 0 && ((col % boxHorizontalBound) == 0)) // Find out when box changes horizontally
-            {
-                currentBoxHorizontal += 1;
-            }
-
-            // Allocate memory for possibilities & initialize max possibilites.
-            int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
-            // TODO: Check the zero'th element of the posArray, can I make a speed improvement?
-            int posCounter = sud->colLength; // How many possibilities are there?
-                for (int number = 1; number <= sud->rowLength; number++)
-                {   // For every row & col, check whether number appears in other place than itself
-                    if (sud->matrix[row][col] != 0)
-                    {
-                        break; // Already a value present
-                    }
-                    else if (checkRow(sud, number, row) == 1) // found matching number
-                    {
-                        posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
-                        posCounter -= 1;
-                        continue;
-                    }
-                    else if (checkCol(sud, number, col) == 1) // found mathcing number   
-                    {
-                        posArray[number] = MAXDIMENSION+1;
-                        posCounter -= 1;
-                        continue;
-                    }
-                    else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
-                    {
-                        posArray[number] = MAXDIMENSION+1;
-                        posCounter -= 1;
-                        continue;
-                    } // remember: Potential bug in pointer arithmetic
-                }
-
-            // Check if there is a single solution possible: 
-            if (posCounter == 1)
-            {
-                for (int number = 1; number <= sud->rowLength; number++) //check for every number
-                {
-                    if (posArray[number] == 0)
-                    {
-                        printf("Found number: %i at row %i col %i | ", number, row+1, col+1);
-                        sud->matrix[row][col] = number;
-                        printf("\n");
-                        printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
-                        amountFoundInIteration += 1;
-                        sud->totalUnsolved -= 1;
-                        break; // break the current loop
-                    }
-                }
-            }
-            free(posArray);
-            }
-        }
-    if (amountFoundInIteration == 0)
+        
+    if (numbersFound == 0)
     {
         printf("Algorithm finds no more numbers. \n");
         break;
     }
-    printf("Amount of numbers found this iteration: %i \n", amountFoundInIteration);
+    printf("Amount of numbers found this iteration: %i \n", numbersFound);
     }
 
 
@@ -428,7 +450,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
-    solveSudoku(sud, MAXITERATIONS);
+    solveSudoku(sud, MAXDIMENSION * MAXDIMENSION);
     outputSudoku(sud);
     free(sud);
 
