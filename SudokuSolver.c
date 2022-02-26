@@ -43,16 +43,6 @@ struct box
     int boxVerticalBound;
 };
 
-// TODO, pass a possibility to the backtrack
-
-/*
-struct possibility
-{
-    int row;
-    int col;
-    int possibilities[MAXDIMENSION];
-};
-*/
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
@@ -443,7 +433,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     -- if no possibilities found, return 1
     */
 
-   
+
 
    return 0;
 
