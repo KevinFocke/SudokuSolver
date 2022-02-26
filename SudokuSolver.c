@@ -43,6 +43,11 @@ struct box
     int boxVerticalBound;
 };
 
+// prototype
+
+int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind);
+int outputSudoku(struct sudoku *sud);
+
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
@@ -218,7 +223,6 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
     initBoxList(sud, *dataDimension);
-    //initPossList(sud, *dataDimension);
     countUnsolved(sud); //how many entries unsolved?
 
     return 0;
@@ -311,7 +315,7 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     return 0; // found no match
 }
 
-int simpleFindPossCounter(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
+int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
 {
     int posCounter = sud->colLength; // How many possibilities are there?
 
@@ -377,9 +381,9 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
         // Eliminate possibilities
          
-        int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
+        int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int)); // Free + TODO: Optimize length of posArray to match the remaining number of possibilities.  (no need to check every number if there are only 2 possibilities, eg. 5 and 9 are possible; instead of [1,1,1,1,0,1,1,1,1,0] do [5,9])
 
-        int posCounter = simpleFindPossCounter(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
+        int posCounter = simplePoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
         // Allocate memory for possibilities & initialize max possibilites.
 
         // Check if there is a single solution possible: 
@@ -410,12 +414,57 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
         free(posArray);
         }
     }
-    // Checks every row, col, and box redundantly.
+    if(*numbersFound == 0)
+    {
+        return 1;
+    }
+
     return 0;
 }
 
+int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
+{
+    // *sudToCopy will be the copied sud, saved in *sudTarget
 
- int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
+    sudTarget->backtrackIterations = sudToCopy ->backtrackIterations;
+    sudTarget->boxWidth = sudToCopy->boxWidth;
+    sudTarget->colLength = sudToCopy->colLength;
+    sudTarget->initialUnsolved = sudToCopy->initialUnsolved;
+    sudTarget->numbersFoundTotal = sudToCopy->numbersFoundTotal;
+    sudTarget->numbersToFind = sudToCopy->numbersToFind;
+    sudTarget->rowLength = sudToCopy->rowLength;
+    sudTarget->size = sudToCopy->size;
+    sudTarget->solveIterations = sudToCopy->solveIterations;
+    sudTarget->totalUnsolved = sudToCopy ->totalUnsolved;
+    
+
+    // What with boxlist and matrix?
+
+    //Allocate space for matrix
+    int **matrix = (int **)saferCalloc(sudToCopy->rowLength, sizeof(int*)); // Dynamically allocate pointers to an array.
+    for (int i = 0; i < sudToCopy->rowLength; i++) {
+        matrix[i] = (int *)saferCalloc(sudToCopy->colLength, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+    }
+    sudTarget->matrix = matrix;
+    for (int row = 0; row < sudToCopy->rowLength; row++)
+    {
+        for (int col = 0; col < sudToCopy->colLength; col++)
+        {
+            sudTarget->matrix[row][col] = sudToCopy->matrix[row][col];
+        }
+    }
+
+    initBoxList(sudTarget, sudTarget->rowLength);
+
+    printf("Original matrix: \n");
+    printMatrix(sudToCopy->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
+    printf("Copied matrix: \n");
+    printMatrix(sudTarget->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
+
+    return 0;
+}
+
+int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
     
     /*
@@ -443,7 +492,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
    else if (algoReturnCode == 1) // No numbers found
    {
        // Find most constrained box
-       /*
+       
        int minBoxVertical = MAXDIMENSION + 1;
        int minBoxHorizontal = MAXDIMENSION + 1;
        int minBoxUnsolvedCount = MAXDIMENSION + 1;
@@ -464,7 +513,90 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                
            }
        }
-       */
+
+        int boxHorizontalBound = floor(sqrt((double)sud->colLength));
+        int boxVerticalBound = floor(sqrt((double)sud->rowLength));
+
+        // Within the most constrained box, look for the field with the lowest possibilities
+        int lowestFieldPos = MAXDIMENSION+1;
+        int lowestPosArray[sud->colLength + 1];
+        int lowestFieldRow = MAXDIMENSION + 1;
+        int lowestFieldCol = MAXDIMENSION + 1;
+
+        // In the box, find the field with min possibilities
+        for (int rowBox = 0; rowBox < sud->boxWidth; rowBox++)
+        {
+            for (int colBox = 0; colBox < sud->boxWidth; colBox++)
+            {
+                
+            int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
+            int posCount = simplePoss(sud, rowBox, colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
+            if (posCount < lowestFieldPos && posCount > 1)
+            {
+                lowestFieldPos = posCount;
+                lowestFieldRow = rowBox;
+                lowestFieldCol = colBox;
+
+                // Copy lowest pos array
+                for (int i = 0; i < (sud->colLength + 1); i++)
+                {
+                    lowestPosArray[i] = posArray[i];
+                }
+            }
+            free(posArray);
+            }
+        }
+
+        // We have lowest field now, try the possibilities
+
+        
+
+
+        int solveReturnCode;
+
+        for (int number = 1; number <= sud->rowLength; number++)
+            {
+                if (lowestPosArray[number] == 0) // Number is still possible
+                {
+                    // Create temp matrix, fill it with number try
+                    struct sudoku *sudTemp = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku));
+                    deepCopySud(sud,sudTemp);
+                    sudTemp->matrix[lowestFieldRow][lowestFieldCol] = number;
+                    printf("\n \n Trying new Matrix via backtracking \n \n");
+                    printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
+                    *numbersFound += 1;
+                    sudTemp->numbersFoundTotal += 1;
+                    sudTemp->totalUnsolved -= 1;
+
+                    int *iterations = (int *)saferCalloc(1,sizeof(int));
+                    *iterations = MAXITERATIONS;
+                    // TODO: Think through iterations, is this fully correct?
+                    solveReturnCode = solveSudoku(sudTemp, 0, iterations, sudTemp->numbersToFind);
+
+                    if(solveReturnCode == 0) // Found a full sudoku!
+                    {
+                        sud = sudTemp; // The temp sudoku is the real sudoku!
+                        *numbersFound = 0;
+                        return 0;
+                    }
+                    else
+                    {
+                        *numbersFound -= 1;
+                        free(sudTemp);
+                        continue;
+                    }
+                    
+                    /*
+                    TODO: Fix numbersToFind, let it first completely solve the sudoku before giving hint
+                    if (numbersToFind == sud->numbersFoundTotal)
+                    {
+                        return 0;
+                    }
+                    break;*/ 
+                }
+            }
+
+
     }
 
     else
@@ -506,8 +638,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
     for (int i = 0; i < *iterations; i++)
     {
         int numbersFound = 0; // How many numbers were found this iteration?
-        printf("Current iteration: %i \n", i+1);
         sud->solveIterations += 1;
+        printf("Current iteration: %i \n", sud->solveIterations);
     
         (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind); // Solve using the chosen algoMethod
 
@@ -524,8 +656,10 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
         if (sud->numbersFoundTotal == sud->initialUnsolved)
         {
             printf("All numbers were found! \n"); // backtrack base cases
-            printf("Solving took %i iterations \n", sud->solveIterations); 
-            return 0; // all numbers were found!
+            printf("Solving took %i iterations \n", sud->solveIterations);
+            outputSudoku(sud);
+            exit(0); //TEMPORARY SOLUTION, TODO: In backtracking, fix underlying sudoku
+            //return 0; // all numbers were found!
         }
         else
         {
@@ -563,14 +697,14 @@ int main(void){
     //TODO: Enable queuing sudokus
     //TODO: add flag for algo choice & iterations
 
-    int algoChoice = 1; // Default algo is simple algo.
+    int algoChoice = 1;
     
     int iterations = MAXDIMENSION * MAXDIMENSION; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
     int numbersToFind = MAXDIMENSION*MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input.txt";
+    char filename[] = "sudoku_input_medium2.txt";
     
     // Process per Sudoku
 

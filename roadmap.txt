@@ -26,6 +26,8 @@ e.g.
 0 0 0 0 0 0 0 1 9
 
 - Implement backtracking algorithm
+BUG: The backtracking algo only looks at the first box. If it can't find by quessing the first box, it won't find anything more!
+BUG: Solve prints twice (because backtrack calls it) & the sudTemp does not replace the sud downstream, no idea why.
 - Add command line recognizition of flags, filename=mytext.txt 
 
 - Refactor input error detection; using fgets and regex
@@ -69,6 +71,8 @@ NORMAL vibp // replace inside brackets, goes to visual mode, selects inner brack
 NORMAL '' // go back to previous place.
 
 Pointers are fun and efficient, but don't overdo. If a pointer is accidentally changed (its value or reference) it can effect the WHOLE downstream.
+
+Problematic: Making a deep copy of a struct with pointers.
 
 Reflect: 
 In checkRow & checkCol I wanted to use DRY programming, but found it difficult because you need to access the right element in the matrix. How could I have made it DRY??
