@@ -31,6 +31,8 @@ struct sudoku
     int numbersFoundTotal;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
+    int solveIterations; // How many iterations did solve run
+    int backtrackIterations;
 };
 
 struct box
@@ -207,6 +209,8 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     // assign one-dimensional attributes
     sud->size = *size;
     sud->rowLength = sud->colLength = *dataDimension; // square hence same length and width
+    sud->backtrackIterations = 0;
+    sud->solveIterations = 0;
     // initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
@@ -325,6 +329,7 @@ int simpleFindPoss(struct sudoku *sud, int row, int col, int *posArray, int curr
         {   // For every row & col, check whether number appears
             if (sud->matrix[row][col] != 0)
             {
+                posCounter = 0;
                 break; // Already a value present
             }
 
@@ -353,7 +358,7 @@ int simpleFindPoss(struct sudoku *sud, int row, int col, int *posArray, int curr
             } // remember: Potential bug in pointer arithmetic
         }
 
-    return 0;
+    return posCounter;
 }
 
 int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
@@ -422,36 +427,26 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
  int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
-    /* base cases    
-    simpleSudoku returns 1; // 
-    simpleSudoku returns 0;
+    
+    /*
+    Pseudocode:
+    run simpleAlgo
+    if simpleAlgo returns 0, then exit backTrackAlgo (single iteration completed)
+    if simpleAlgo returns 1:
+    - find the most contstrained box in the sudoku
+    - find the possibilities of that box
+    - create a temp sudoku copy
+    - fill in a possibility of that sudoku
+    - run solveSudoku with simpleAlgo on that field
+    -- if found, return 0
+    -- if not found, try other possibility
+    -- if no possibilities found, return 1
     */
 
-   // Start by doing a regular simpleSudoku search until no more numbers are found
-
-   solveSudoku(sud,0,MAXITERATIONS,MAXITERATIONS); 
-
-   // Step 1. Make a copy of the current sudoku
    
 
-   struct sudoku *tempSud;
-   tempSud = sud; // copy by value
-    
+   return 0;
 
-   // Step 2. Fill in a random value out of the possibilities
-
-   // Step 3. Solve the tempSud using the simple method
-
-/*   Step 4. Was the sudoku fully solved? 
-   If yes, make tempSud the final sud
-   If no, throw away the tempSud, solve again using the backup sud
-  */ 
-
-   //
-
-
-
-    return 0;
 }
 
 
@@ -463,12 +458,13 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
     The argument algoChoice refers to the chosen algorithm:
 
     0 = Simple Method (check every row, col, box)
+    1 = Backtracking using the simple method
 
 
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo, backtrackAlgo}; 
     /*array of functions
     
     The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
@@ -483,8 +479,10 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
     {
         int numbersFound = 0; // How many numbers were found this iteration?
         printf("Current iteration: %i \n", i+1);
+        sud->solveIterations += 1;
     
-    (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind);
+        (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind); // Solve using the chosen algoMethod
+
 
     if (numbersToFind == sud->numbersFoundTotal)
     {
@@ -497,7 +495,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
 
         if (sud->numbersFoundTotal == sud->initialUnsolved)
         {
-            printf("All numbers were found!"); // backtrack base cases
+            printf("All numbers were found! \n"); // backtrack base cases
+            printf("Solving took %i iterations \n", sud->solveIterations); 
             return 0; // all numbers were found!
         }
         else
@@ -543,7 +542,7 @@ int main(void){
     int numbersToFind = MAXDIMENSION*MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input_simple.txt";
+    char filename[] = "sudoku_input.txt";
     
     // Process per Sudoku
 
