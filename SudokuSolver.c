@@ -1,3 +1,6 @@
+// Under simpleALGO: Make search for possibilities its own procedure & 
+
+
 
 // Sudoku Solver
 #include <stdio.h>
@@ -37,6 +40,17 @@ struct box
     int boxHorizontalBound;
     int boxVerticalBound;
 };
+
+// TODO, pass a possibility to the backtrack
+
+/*
+struct possibility
+{
+    int row;
+    int col;
+    int possibilities[MAXDIMENSION];
+};
+*/
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
@@ -303,6 +317,44 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     return 0; // found no match
 }
 
+int simpleFindPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
+{
+    int posCounter = sud->colLength; // How many possibilities are there?
+
+        for (int number = 1; number <= sud->rowLength; number++)
+        {   // For every row & col, check whether number appears
+            if (sud->matrix[row][col] != 0)
+            {
+                break; // Already a value present
+            }
+
+            // Check the row
+            else if (checkRow(sud, number, row) == 1) // 
+            {
+                posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
+                posCounter -= 1;
+                continue;
+            }
+
+            // Check the col
+            else if (checkCol(sud, number, col) == 1) // found mathcing number   
+            {
+                posArray[number] = MAXDIMENSION+1;
+                posCounter -= 1;
+                continue;
+            }
+
+            // Check the box
+            else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+            {
+                posArray[number] = MAXDIMENSION+1;
+                posCounter -= 1;
+                continue;
+            } // remember: Potential bug in pointer arithmetic
+        }
+
+    return 0;
+}
 
 int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
@@ -329,43 +381,11 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
 
         // Eliminate possibilities
-
-        // Allocate memory for possibilities & initialize max possibilites.
+         
         int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
 
-        int posCounter = sud->colLength; // How many possibilities are there?
-
-            for (int number = 1; number <= sud->rowLength; number++)
-            {   // For every row & col, check whether number appears
-                if (sud->matrix[row][col] != 0)
-                {
-                    break; // Already a value present
-                }
-
-                // Check the row
-                else if (checkRow(sud, number, row) == 1) // 
-                {
-                    posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
-                    posCounter -= 1;
-                    continue;
-                }
-
-                // Check the col
-                else if (checkCol(sud, number, col) == 1) // found mathcing number   
-                {
-                    posArray[number] = MAXDIMENSION+1;
-                    posCounter -= 1;
-                    continue;
-                }
-
-                // Check the box
-                else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
-                {
-                    posArray[number] = MAXDIMENSION+1;
-                    posCounter -= 1;
-                    continue;
-                } // remember: Potential bug in pointer arithmetic
-            }
+        int posCounter = simpleFindPoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
+        // Allocate memory for possibilities & initialize max possibilites.
 
         // Check if there is a single solution possible: 
         if (posCounter == 1)
@@ -399,28 +419,33 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     return 0;
 }
 
-int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
+
+ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 {
     /* base cases    
     simpleSudoku returns 1; // 
     simpleSudoku returns 0;
-
-    solveSudoku(sud, 1, )
     */
 
-   // Step 1. Make a copy of the current sudoku
+   // Start by doing a regular simpleSudoku search until no more numbers are found
 
-   //struct sudoku *tempSud;
-   //tempSud = sud;
+   solveSudoku(sud,0,MAXITERATIONS,MAXITERATIONS); 
+
+   // Step 1. Make a copy of the current sudoku
+   
+
+   struct sudoku *tempSud;
+   tempSud = sud; // copy by value
+    
 
    // Step 2. Fill in a random value out of the possibilities
 
    // Step 3. Solve the tempSud using the simple method
 
-   /*Step 4. Was the sudoku fully solved? 
+/*   Step 4. Was the sudoku fully solved? 
    If yes, make tempSud the final sud
    If no, throw away the tempSud, solve again using the backup sud
-   */
+  */ 
 
    //
 
@@ -428,6 +453,8 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
     return 0;
 }
+
+
 int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind)
 {
 
@@ -442,7 +469,6 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
 
     // Main algo method
     int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo}; 
-
     /*array of functions
     
     The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
@@ -468,8 +494,17 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
 
     if (numbersFound == 0)
     {
-        printf("Algorithm finds no more numbers. \n");
-        return 1;
+
+        if (sud->numbersFoundTotal == sud->initialUnsolved)
+        {
+            printf("All numbers were found!"); // backtrack base cases
+            return 0; // all numbers were found!
+        }
+        else
+        {
+            printf("Algorithm did not find all numbers. \n");
+            return 1;
+        }
     }
 
     printf("Amount of numbers found this iteration: %i \n", numbersFound);
@@ -508,7 +543,7 @@ int main(void){
     int numbersToFind = MAXDIMENSION*MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input.txt";
+    char filename[] = "sudoku_input_simple.txt";
     
     // Process per Sudoku
 
