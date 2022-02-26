@@ -311,7 +311,7 @@ int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int c
     return 0; // found no match
 }
 
-int simpleFindPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
+int simpleFindPossCounter(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
 {
     int posCounter = sud->colLength; // How many possibilities are there?
 
@@ -379,7 +379,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
          
         int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
 
-        int posCounter = simpleFindPoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
+        int posCounter = simpleFindPossCounter(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
         // Allocate memory for possibilities & initialize max possibilites.
 
         // Check if there is a single solution possible: 
@@ -433,9 +433,47 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     -- if no possibilities found, return 1
     */
 
+   int algoReturnCode = simpleAlgo(sud,numbersFound,numbersToFind); // run algo, save return code
+   
+   if (algoReturnCode == 0) // Found numbers
+   {
+       return 0;
+   }
 
+   else if (algoReturnCode == 1) // No numbers found
+   {
+       // Find most constrained box
+       /*
+       int minBoxVertical = MAXDIMENSION + 1;
+       int minBoxHorizontal = MAXDIMENSION + 1;
+       int minBoxUnsolvedCount = MAXDIMENSION + 1;
+       int curBoxUnsolvedCount = -1;
 
-   return 0;
+       for (int boxVertical = 0; boxVertical < sud->boxWidth; boxVertical++)
+       {
+           for (int boxHorizontal = 0; boxHorizontal < sud->boxWidth; boxHorizontal++)
+           {
+               curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount;
+               if (curBoxUnsolvedCount < minBoxUnsolvedCount && curBoxUnsolvedCount > 1) // There has to be more than 1 unsolved in the box
+               {
+                   // If lowest count, make min box the current box
+                   minBoxVertical = boxVertical;
+                   minBoxHorizontal = boxHorizontal;
+                   minBoxUnsolvedCount = curBoxUnsolvedCount;
+               }
+               
+           }
+       }
+       */
+    }
+
+    else
+    {
+        printf("Unexpected return simpleAlgo return code.");
+        exit(1);
+    }
+
+    return 0;
 
 }
 
@@ -525,7 +563,7 @@ int main(void){
     //TODO: Enable queuing sudokus
     //TODO: add flag for algo choice & iterations
 
-    int algoChoice = 0; // Default algo is simple algo.
+    int algoChoice = 1; // Default algo is simple algo.
     
     int iterations = MAXDIMENSION * MAXDIMENSION; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;

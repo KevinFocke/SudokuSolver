@@ -36,13 +36,10 @@ https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-d
 
 Ver 3:
 - Add test cases
-- Implement more efficient possMatrix
-- Graph the timings of different algorithms.
 - Increase the portability of the code
 - Refactor code to make more extendible.
 
 Ver 4:
-- Implement race conditions per box
 - Add ability to queue multiple sudoku's
 - Graph the timings accross sudoku's across algorithms
 
@@ -60,7 +57,7 @@ Ver 6:
 Lessons learned:
 
 - Be more consistent with casing. CAPITALS for globals. camelCase for local vars.
-- Be more granular with commits. One thing at a time.
+- Be more granular with commits. One thing at a time. Learn branching + merging for this purpose.
 
 There has to be an easier way to delete THIS:
 (int arg1, int arg2, int THIS);
