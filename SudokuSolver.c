@@ -704,7 +704,7 @@ int main(void){
     int numbersToFind = MAXDIMENSION*MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input_medium2.txt";
+    char filename[] = "sudoku_input_medium.txt";
     
     // Process per Sudoku
 
