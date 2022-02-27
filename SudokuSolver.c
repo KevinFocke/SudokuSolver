@@ -15,7 +15,7 @@
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
-const int MAXITERATIONS = 81;
+const int MAXITERATIONS = MAXDIMENSION * MAXDIMENSION;
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
 // Sudoku is represented as a 2D matrix
@@ -571,13 +571,13 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                     int *iterations = (int *)saferCalloc(1,sizeof(int));
                     *iterations = MAXITERATIONS;
                     // TODO: Think through iterations, is this fully correct?
-                    solveReturnCode = solveSudoku(sudTemp, 0, iterations, sudTemp->numbersToFind);
+                    solveReturnCode = solveSudoku(sudTemp, 1, iterations, sudTemp->numbersToFind);
 
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
                         deepCopySud(sudTemp, sud); // The temp sudoku is the real sudoku!
                         printf("Backtracking found a complete sudoku \n");
-                        *numbersFound = 0;
+                        *numbersFound = 0; // BUG: Overcounts number by 1, temp fix
                         return 0;
                     }
                     else
@@ -586,14 +586,6 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                         free(sudTemp);
                         continue;
                     }
-                    
-                    /*
-                    TODO: Fix numbersToFind, let it first completely solve the sudoku before giving hint
-                    if (numbersToFind == sud->numbersFoundTotal)
-                    {
-                        return 0;
-                    }
-                    break;*/ 
                 }
             }
 
@@ -658,8 +650,6 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
         {
             printf("All numbers were found! \n"); // backtrack base cases
             printf("Solving took %i iterations \n", sud->solveIterations);
-            outputSudoku(sud);
-            // TODO: Fix double print in backtracking
             return 0;
         }
         else
@@ -685,7 +675,7 @@ int outputSudoku(struct sudoku *sud)
     }
     else
     {
-        printf("Solution not found. Solved %i out of %i\n current Matrix:\n", sud->numbersFoundTotal, sud->initialUnsolved);
+        printf("Solution not found. Solved %i out of %i\n Sudoku:\n", sud->numbersFoundTotal, sud->initialUnsolved);
         printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
     }
 
@@ -700,9 +690,9 @@ int main(void){
 
     int algoChoice = 1;
     
-    int iterations = MAXDIMENSION * MAXDIMENSION; // default iterations
+    int iterations = MAXITERATIONS; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
-    int numbersToFind = MAXDIMENSION*MAXDIMENSION;
+    int numbersToFind = MAXITERATIONS; // BUG: Does not solve complete Matrix before providing numbers. Now it can give the wrong numbers!
 
     // Init vars
     char filename[] = "sudoku_input_medium.txt";
@@ -727,10 +717,11 @@ int main(void){
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
+    
     initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
     solveSudoku(sud, algoChoice, &iterations, numbersToFind);
     outputSudoku(sud);
-    free(sud);
+    free(sud); 
 
     return 0; // main finished succesfully 
 }

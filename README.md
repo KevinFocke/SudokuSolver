@@ -50,7 +50,10 @@ e.g.
 
 - Implement backtracking algorithm
 BUG: The backtracking algo only looks at the first box. If it can't find by quessing the first box, it won't find anything more!
-BUG: Solve prints twice (because backtrack calls it) & the sudTemp does not replace the sud downstream, no idea why.
+BUG: Solve prints twice (because backtrack calls it) & 
+
+x BUG: The sudTemp does not replace the sud downstream, no idea why.
+
 - Add command line recognizition of flags, filename=mytext.txt 
 
 - Refactor input error detection; using fgets and regex
