@@ -1,7 +1,3 @@
-// Under simpleALGO: Make search for possibilities its own procedure & 
-
-
-
 // Sudoku Solver
 #include <stdio.h>
 #include <ctype.h>

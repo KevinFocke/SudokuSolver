@@ -98,7 +98,7 @@ NORMAL '' // go back to previous place.
 
 Pointers are fun and efficient, but don't overdo. If a pointer is accidentally changed (its value or reference) it can effect the WHOLE downstream.
 
-Problematic: Making a deep copy of a struct with pointers.
+Problematic: Making a deep copy of a struct with pointers. Can be solved by making a subroutine to copy every element of a struct, and run another subroutine to reconstruct the pointers within it.
 
 Reflect: 
 In checkRow & checkCol I wanted to use DRY programming, but found it difficult because you need to access the right element in the matrix. How could I have made it DRY??
