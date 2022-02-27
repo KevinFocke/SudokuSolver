@@ -52,7 +52,7 @@ e.g.
 BUG: The backtracking algo only looks at the first box. If it can't find by quessing the first box, it won't find anything more!
 BUG: Solve prints twice (because backtrack calls it) & 
 
-x BUG: The sudTemp does not replace the sud downstream, no idea why.
+x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 
 - Add command line recognizition of flags, filename=mytext.txt 
 
@@ -68,14 +68,10 @@ Ver 3:
 - Refactor code to make more extendible.
 
 Ver 4:
-- Add ability to queue multiple sudoku's
-- Graph the timings accross sudoku's across algorithms
-
-Ver 5:
 - Host online version of the sudoku maker and solver.
 - Add cloud computing support
 
-Ver 6:
+Ver 5:
 - Add photo mode, make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
 - Convert ints to a shorter type depending on needed number range?
