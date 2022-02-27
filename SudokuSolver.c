@@ -377,7 +377,12 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
         // Eliminate possibilities
          
-        int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int)); // Free + TODO: Optimize length of posArray to match the remaining number of possibilities.  (no need to check every number if there are only 2 possibilities, eg. 5 and 9 are possible; instead of [1,1,1,1,0,1,1,1,1,0] do [5,9])
+        int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int)); 
+        /* Potential optimization:
+        Optimize length of posArray to match the remaining number of possibilities.  
+        (no need to check every number if there are only 2 possibilities, 
+        eg. 5 and 9 are possible; instead of [1,1,1,1,0,1,1,1,1,0] do [5,9])
+        */
 
         int posCounter = simplePoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
         // Allocate memory for possibilities & initialize max possibilites.
