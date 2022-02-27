@@ -64,6 +64,7 @@ https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-d
 
 Ver 3:
 - Add test cases
+- Track bugs outside of the code (github? elsewhere?)
 - Increase the portability of the code
 - Refactor code to make more extendible.
 
