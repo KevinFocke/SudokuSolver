@@ -576,6 +576,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
                         deepCopySud(sudTemp, sud); // The temp sudoku is the real sudoku!
+                        printf("Backtracking found a complete sudoku \n");
                         *numbersFound = 0;
                         return 0;
                     }
@@ -658,8 +659,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
             printf("All numbers were found! \n"); // backtrack base cases
             printf("Solving took %i iterations \n", sud->solveIterations);
             outputSudoku(sud);
-            exit(0); //TEMPORARY SOLUTION, TODO: In backtracking, fix underlying sudoku
-            //return 0; // all numbers were found!
+            // TODO: Fix double print in backtracking
+            return 0;
         }
         else
         {
