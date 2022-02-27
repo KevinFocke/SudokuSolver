@@ -122,7 +122,7 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     
     a 9 x 9 Matrix will have 9 boxes:
     B B B
-    B B B   (the first B in this row has boxPosVertical 0, boxPosHorizontal 1)
+    B B B   (the first B in this row has boxPosVertical 0, boxPosHorizontal 0)
     B B B
 
     boxRow & boxCol refer to the cols and row INSIDE a box.
@@ -575,7 +575,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
-                        sud = sudTemp; // The temp sudoku is the real sudoku!
+                        deepCopySud(sudTemp, sud); // The temp sudoku is the real sudoku!
                         *numbersFound = 0;
                         return 0;
                     }
