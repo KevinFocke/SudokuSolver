@@ -96,7 +96,16 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     return 0;
 }
 
-int countBoxUnsolved();
+int countBoxUnsolved(struct sudoku *sud)
+{
+    // returns -1 if mistake, else returns boxcount
+    int tempUnsolved = sud->colLength;
+
+
+    return tempUnsolved;
+
+
+}
 
 int countSudUnsolved(struct sudoku *sud)
 {
@@ -144,12 +153,15 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     // Assign pointers + calculate unsolvedcount
     int tempUnsolved = sud->colLength;
 
-   for (int row = 0; row < boxWidth; row++)
+    // TODO: Merge branch!!!
+    // TODO: refactor boxWidth (part of the sud);
+
+   for (int boxRow = 0; boxRow < boxWidth; boxRow++)
    {
-       for (int col = 0; col < boxWidth; col++)
+       for (int boxCol = 0; boxCol < boxWidth; boxCol++)
        {
-           tempBoxMatrix[row][col] = &(sud->matrix[row+(boxPosVertical*3)][col+(boxPosHorizontal*3)]);
-            int curval = *(tempBoxMatrix[row][col]);
+           tempBoxMatrix[boxRow][boxCol] = &(sud->matrix[boxRow+(boxPosVertical*3)][boxCol+(boxPosHorizontal*3)]);
+            int curval = *(tempBoxMatrix[boxRow][boxCol]);
             if (curval != 0)
             {
                 tempUnsolved -= 1;
@@ -157,7 +169,9 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
 
        }
    }
+
     box->pointerMatrix = tempBoxMatrix;
+    
     box->unsolvedCount = tempUnsolved;
     // TODO: Snake matrix, customize boxWidth
 
@@ -705,7 +719,7 @@ int main(void){
     int numbersToFind = MAXITERATIONS; // BUG: Does not solve complete Matrix before providing numbers. Now it can give the wrong numbers!
 
     // Init vars
-    char filename[] = "sudoku_input_medium2.txt";
+    char filename[] = "sudoku_input_medium.txt";
     
     // Process per Sudoku
 
