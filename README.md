@@ -54,6 +54,8 @@ BUG: Solve prints twice (because backtrack calls it) &
 
 x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 
+- BUG: Backtracking keeps trying numbers even if a number cannot work.
+
 - Add command line recognizition of flags, filename=mytext.txt 
 
 - Refactor input error detection; using fgets and regex
@@ -65,14 +67,13 @@ https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-d
 - Check for memory leaks (valgrind)
 
 Ver 3:
+- Fix solving iteration count 
 - refactor dataDimension; encapsulate within the sudoku.
 - refactor boxHorizontalBound & boxVerticalBound (encapsulate within box)
 - refactor outputSudoku to make a .txt with the final sudoku
 - compare initial sudoku vs end sudoku
 - Add test cases
 - Track bugs outside of the code (github? elsewhere?)
-- Increase the portability of the code
-- Refactor code to make more extendible.
 
 Ver 4:
 - Host online version of the sudoku maker and solver.

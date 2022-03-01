@@ -494,10 +494,10 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
 
     initBoxList(sudTarget, sudTarget->rowLength);
 
-    printf("Original matrix: \n");
+    /*printf("Original matrix: \n");
     printMatrix(sudToCopy->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     printf("Copied matrix: \n");
-    printMatrix(sudTarget->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
+    printMatrix(sudTarget->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);*/
 
     return 0;
 }
@@ -554,6 +554,11 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
            }
        }
 
+        if (minBoxVertical == MAXDIMENSION+1 || minBoxHorizontal == MAXDIMENSION+1) // If no constrained box is found
+        {
+            return 1;
+        }
+
         int boxHorizontalBound = floor(sqrt((double)sud->colLength));
         int boxVerticalBound = floor(sqrt((double)sud->rowLength));
 
@@ -574,14 +579,15 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
         {
             for (int colBox = 0; colBox < sud->boxWidth; colBox++)
             {
-                
+            
+            // minbox
             int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
-            int posCount = simplePoss(sud, rowBox, colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
+            int posCount = simplePoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
             if (posCount < lowestFieldPos && posCount > 1)
             {
                 lowestFieldPos = posCount;
-                lowestFieldRow = rowBox;
-                lowestFieldCol = colBox;
+                lowestFieldRow = (minBoxVertical*boxVerticalBound) + rowBox;
+                lowestFieldCol = (minBoxHorizontal*boxHorizontalBound) + colBox;
 
                 // Copy lowest pos array
                 for (int i = 0; i < (sud->colLength + 1); i++)
@@ -609,7 +615,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                     deepCopySud(sud,sudTemp);
                     sudTemp->matrix[lowestFieldRow][lowestFieldCol] = number;
                     printf("\n \n Trying new Matrix via backtracking \n \n");
-                    printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
+                    // printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
                     *numbersFound += 1;
                     sudTemp->numbersFoundTotal += 1;
                     sudTemp->totalUnsolved -= 1;
@@ -647,7 +653,6 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     return 0;
 
 }
-
 
 int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind)
 {
