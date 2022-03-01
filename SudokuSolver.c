@@ -228,7 +228,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimension)
+int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
@@ -253,12 +253,12 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *matrixDimens
     {
         if (*dataCount == i * i)
         {
-            *matrixDimension = i;
+            *dataDimension = i;
             break;
         }
     }
 
-    if (*matrixDimension == 0)
+    if (*dataDimension == 0)
     {
         printf("\n Invalid dataCount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*dataCount,MAXDIMENSION);
         exit(1);
@@ -710,7 +710,7 @@ int main(void){
     // Process per Sudoku
 
     int dataCount;
-    int matrixDimension;
+    int dataDimension; // DataDimension
     // Initialize the maximum possible sudoku array; one-dimensional
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
     for (int i = 0; i < MAXARRAY; i++)
@@ -719,7 +719,7 @@ int main(void){
     }
 
     //Function calls
-    if (readFile(filename, &dataCount, sudokuArray, &matrixDimension))
+    if (readFile(filename, &dataCount, sudokuArray, &dataDimension))
     {
         printf("Failed to read file.");
         exit(1);
@@ -728,7 +728,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     
-    initSudoku(&dataCount,&matrixDimension, sudokuArray, sud) ;
+    initSudoku(&dataCount,&dataDimension, sudokuArray, sud) ;
     solveSudoku(sud, algoChoice, &iterations, numbersToFind);
     outputSudoku(sud);
     free(sud); 

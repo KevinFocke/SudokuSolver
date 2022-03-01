@@ -60,9 +60,12 @@ x BUG: The sudTemp does not replace the sud downstream. // Solved by making a de
 https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
 
 - Allow queuing sudokus
+
+
 - Check for memory leaks (valgrind)
 
 Ver 3:
+- refactor dataDimension; encapsulate within the sudoku.
 - Add test cases
 - Track bugs outside of the code (github? elsewhere?)
 - Increase the portability of the code
