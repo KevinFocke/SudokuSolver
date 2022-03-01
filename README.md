@@ -66,6 +66,7 @@ https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-d
 
 Ver 3:
 - refactor dataDimension; encapsulate within the sudoku.
+- refactor boxHorizontalBound & boxVerticalBound (encapsulate within box)
 - refactor outputSudoku to make a .txt with the final sudoku
 - compare initial sudoku vs end sudoku
 - Add test cases

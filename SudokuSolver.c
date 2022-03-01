@@ -96,16 +96,31 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     return 0;
 }
 
-int countBoxUnsolved(struct sudoku *sud)
+int countBoxUnsolved(struct box *box)
 {
     // returns -1 if mistake, else returns boxcount
-    int tempUnsolved = sud->colLength;
 
+    int boxUnsolvedCount = box->boxHorizontalBound * box->boxVerticalBound; // TODO: Fix for snake matrix
 
-    return tempUnsolved;
+    for (int boxRow = 0; boxRow < box->boxHorizontalBound; boxRow++)
+    {
+        for (int boxCol = 0; boxCol < box->boxVerticalBound; boxCol++)
+        {
+            int curval = *(box->pointerMatrix[boxRow][boxCol]);
+            if (curval != 0)
+            {
+                boxUnsolvedCount -= 1;
+            }
+
+       }
+   }   
+
+    
+    return boxUnsolvedCount;
 
 
 }
+
 
 int countSudUnsolved(struct sudoku *sud)
 {
@@ -126,13 +141,17 @@ int countSudUnsolved(struct sudoku *sud)
 
 int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int boxPosHorizontal, int boxWidth)
 {
-    /* Terminology: boxPos refer to the position of the box within the matrix.
+    /* Terminology: 
+    
+    boxPos refer to the position of the box within the matrix.
     Needed for initializing pointers to elements.
     
     a 9 x 9 Matrix will have 9 boxes:
     B B B
     B B B   (the first B in this row has boxPosVertical 0, boxPosHorizontal 0)
     B B B
+
+    This functions creates 1 Box at pos boxPosVertical, boxPosHorizontal
 
     boxRow & boxCol refer to the cols and row INSIDE a box.
 
@@ -142,7 +161,8 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     P P P
     P P P
     */
-
+    box->boxHorizontalBound = floor(sqrt((double)sud->colLength));
+    box->boxVerticalBound = floor(sqrt((double)sud->rowLength));
    // Memory allocation
    int ***tempBoxMatrix = (int ***)saferCalloc(boxWidth, sizeof(int**));
    for (int i = 0; i < (boxWidth); i++)
@@ -151,28 +171,20 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
    }
 
     // Assign pointers + calculate unsolvedcount
-    int tempUnsolved = sud->colLength;
 
     // TODO: Merge branch!!!
     // TODO: refactor boxWidth (part of the sud);
 
-   for (int boxRow = 0; boxRow < boxWidth; boxRow++)
-   {
-       for (int boxCol = 0; boxCol < boxWidth; boxCol++)
-       {
-           tempBoxMatrix[boxRow][boxCol] = &(sud->matrix[boxRow+(boxPosVertical*3)][boxCol+(boxPosHorizontal*3)]);
-            int curval = *(tempBoxMatrix[boxRow][boxCol]);
-            if (curval != 0)
-            {
-                tempUnsolved -= 1;
-            }
-
-       }
-   }
+    for (int boxRow = 0; boxRow < boxWidth; boxRow++)
+    {
+        for (int boxCol = 0; boxCol < boxWidth; boxCol++)
+        {
+            tempBoxMatrix[boxRow][boxCol] = &(sud->matrix[boxRow+(boxPosVertical*(box->boxVerticalBound))][boxCol+(boxPosHorizontal*(box->boxHorizontalBound))]); // assign pointer to field
+        }
+    }
 
     box->pointerMatrix = tempBoxMatrix;
-    
-    box->unsolvedCount = tempUnsolved;
+    box->unsolvedCount = countBoxUnsolved(box);
     // TODO: Snake matrix, customize boxWidth
 
     return 0;
