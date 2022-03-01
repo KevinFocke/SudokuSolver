@@ -112,11 +112,12 @@ int countBoxUnsolved(struct box *box)
                 boxUnsolvedCount -= 1;
             }
 
-       }
-   }   
+        }
+    }
+    box->unsolvedCount = boxUnsolvedCount; 
 
     
-    return boxUnsolvedCount;
+    return 0;
 
 
 }
@@ -126,16 +127,22 @@ int countSudUnsolved(struct sudoku *sud)
 {
     // Count unsolved entries
     int totalUnsolved = 0;
-    for(int row = 0; row < sud->boxWidth; row++)
+
+    int rowlength = sud->rowLength;
+    int colLength = sud->colLength;
+
+    for (int row = 0; row < rowlength; row++)
     {
-        for (int col = 0; col < sud->boxWidth; col++)
+        for (int col = 0; col < colLength; col++)
         {
-            totalUnsolved += sud->boxList[row][col].unsolvedCount;
+            if (sud->matrix[row][col] == 0)
+            {
+                totalUnsolved += 1;
+            }
         }
-    
     }
+
     sud->totalUnsolved = totalUnsolved;
-    sud->initialUnsolved = totalUnsolved;
     return 0;
 }
 
@@ -250,7 +257,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     // Init boxStructure
     initBoxList(sud, *dataDimension);
     countSudUnsolved(sud); //how many entries unsolved?
-
+    sud->initialUnsolved = sud->totalUnsolved;
     return 0;
 }
 
@@ -347,7 +354,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
 
         for (int number = 1; number <= sud->rowLength; number++)
         {   // For every row & col, check whether number appears
-            if (sud->matrix[row][col] != 0)
+            if (sud->matrix[row][col] != 0 && sud->matrix[row][col] != -1)
             {
                 posCounter = 0;
                 break; // Already a value present
@@ -533,6 +540,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
        {
            for (int boxHorizontal = 0; boxHorizontal < sud->boxWidth; boxHorizontal++)
            {
+               countBoxUnsolved(&(sud->boxList[boxVertical][boxHorizontal]));
                curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount; // BUG: curBoxUnsolvedCount does not change when it's filled in
                if (curBoxUnsolvedCount < minBoxUnsolvedCount && curBoxUnsolvedCount > 1) // There has to be more than 1 unsolved in the box
                // Optimization: If curBoxUnsolvedCount == 2, then break the loop; there will not be a lower value found.
@@ -578,7 +586,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                 // Copy lowest pos array
                 for (int i = 0; i < (sud->colLength + 1); i++)
                 {
-                    lowestPosArray[i] = posArray[i];
+                    lowestPosArray[i] = posArray[i]; //BUG posarray does not get copied
                 }
             }
             free(posArray);
@@ -731,7 +739,7 @@ int main(void){
     int numbersToFind = MAXITERATIONS; // BUG: Does not solve complete Matrix before providing numbers. Now it can give the wrong numbers!
 
     // Init vars
-    char filename[] = "sudoku_input_medium.txt";
+    char filename[] = "sudoku_input_medium2.txt";
     
     // Process per Sudoku
 
