@@ -25,7 +25,6 @@ struct sudoku
     int boxWidth; // Not compatible with snake matrix
     int totalUnsolved;
     int initialUnsolved;
-    int numbersToFind;
     int numbersFoundTotal;
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
@@ -43,7 +42,7 @@ struct box
 
 // prototype
 
-int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind);
+int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations);
 int outputSudoku(struct sudoku *sud);
 
 
@@ -388,7 +387,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
     return posCounter;
 }
 
-int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
+int simpleAlgo(struct sudoku *sud, int *numbersFound)
 {
     int boxHorizontalBound = floor(sqrt((double)sud->colLength));
     int boxVerticalBound = floor(sqrt((double)sud->rowLength));
@@ -435,15 +434,10 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                     printf("Found number: %i at row %i col %i | ", number, row+1, col+1); // one-indexed print
                     sud->matrix[row][col] = number;
                     printf("\n");
-                    printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
+                    // printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
                     *numbersFound += 1;
                     sud->numbersFoundTotal += 1;
                     sud->totalUnsolved -= 1;
-                    if (numbersToFind == sud->numbersFoundTotal)
-                    {
-                        return 0;
-                    }
-                    break;
                 }
             }
         }
@@ -469,7 +463,6 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
     sudTarget->colLength = sudToCopy->colLength;
     sudTarget->initialUnsolved = sudToCopy->initialUnsolved;
     sudTarget->numbersFoundTotal = sudToCopy->numbersFoundTotal;
-    sudTarget->numbersToFind = sudToCopy->numbersToFind;
     sudTarget->rowLength = sudToCopy->rowLength;
     sudTarget->size = sudToCopy->size;
     sudTarget->solveIterations = sudToCopy->solveIterations;
@@ -502,7 +495,7 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
     return 0;
 }
 
-int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
+int backtrackAlgo(struct sudoku *sud, int *numbersFound)
 {
     
     /*
@@ -520,7 +513,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
     -- if no possibilities found, return 1
     */
 
-   int algoReturnCode = simpleAlgo(sud,numbersFound,numbersToFind); // run algo, save return code
+   int algoReturnCode = simpleAlgo(sud,numbersFound); // run algo, save return code
    
    if (algoReturnCode == 0) // Found numbers
    {
@@ -623,7 +616,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
                     int *iterations = (int *)saferCalloc(1,sizeof(int));
                     *iterations = MAXITERATIONS;
                     // TODO: Think through iterations, is this fully correct?
-                    solveReturnCode = solveSudoku(sudTemp, 1, iterations, sudTemp->numbersToFind);
+                    solveReturnCode = solveSudoku(sudTemp, 1, iterations);
 
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
@@ -654,7 +647,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
 }
 
-int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbersToFind)
+int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations)
 {
 
     /* Multiple algorithms are available for solving sudokus. 
@@ -668,7 +661,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*, int) = {simpleAlgo, backtrackAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, backtrackAlgo}; 
     /*array of functions
     
     The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
@@ -685,14 +678,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice, int *iterations, int numbers
         sud->solveIterations += 1;
         printf("Current iteration: %i \n", sud->solveIterations);
     
-        (*algoMethod[algoChoice])(sud, &numbersFound, numbersToFind); // Solve using the chosen algoMethod
-
-
-    if (numbersToFind == sud->numbersFoundTotal)
-    {
-        printf("\n Found %i numbers out of %i requested \n", sud->numbersFoundTotal, numbersToFind);
-        exit(0);
-    }
+        (*algoMethod[algoChoice])(sud, &numbersFound); // Solve using the chosen algoMethod
 
     if (numbersFound == 0)
     {
@@ -741,7 +727,6 @@ int main(void){
     int algoChoice = 1;
     int iterations = MAXITERATIONS; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
-    int numbersToFind = MAXITERATIONS; // BUG: Does not solve complete Matrix before providing numbers. Now it can give the wrong numbers!
 
     // Init vars
     char filename[] = "sudoku_input_medium2.txt";
@@ -768,7 +753,7 @@ int main(void){
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     
     initSudoku(&dataCount,&dataDimension, sudokuArray, sud) ;
-    solveSudoku(sud, algoChoice, &iterations, numbersToFind);
+    solveSudoku(sud, algoChoice, &iterations);
     outputSudoku(sud);
     free(sud); 
 

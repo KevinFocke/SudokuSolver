@@ -28,29 +28,11 @@ Ver 2:
 
 x Make extendible with different algorithms.
 
-- Solve cases with 2 or more possible fields 
+x Implement backtracking algorithm
 
-e.g.
+x BUG: The backtracking algo only looks at the first box. 
 
-9 5 0 0 0 0 0 0 0
-
-7 0 0 4 0 0 0 0 0
-
-0 1 4 0 2 7 0 0 0
-
-0 4 0 0 0 1 6 8 0
-
-5 0 0 0 0 0 0 0 2
-
-0 7 6 8 0 0 0 4 0
-
-0 0 X 3 5 0 2 6 0       solution: X is 7
-
-0 0 0 0 0 0 0 1 9
-
-- Implement backtracking algorithm
-BUG: The backtracking algo only looks at the first box. If it can't find by quessing the first box, it won't find anything more!
-BUG: Solve prints twice (because backtrack calls it) & 
+- BUG: Solve prints twice (because backtrack calls it)
 
 x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 
