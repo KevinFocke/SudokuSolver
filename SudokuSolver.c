@@ -1,3 +1,5 @@
+//TODO: Debug Backtracking, why can it not find medium2 & difficult solutions?
+
 // Sudoku Solver
 #include <stdio.h>
 #include <ctype.h>
@@ -94,7 +96,9 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     return 0;
 }
 
-int countUnsolved(struct sudoku *sud)
+int countBoxUnsolved();
+
+int countSudUnsolved(struct sudoku *sud)
 {
     // Count unsolved entries
     int totalUnsolved = 0;
@@ -219,7 +223,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
     initBoxList(sud, *dataDimension);
-    countUnsolved(sud); //how many entries unsolved?
+    countSudUnsolved(sud); //how many entries unsolved?
 
     return 0;
 }
@@ -393,7 +397,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
             //Find the only possible number
             for (int number = 1; number <= sud->rowLength; number++)
             {
-                if (posArray[number] == 0)
+                if (posArray[number] == 0) // If the number has not been used yet
                 {
                     printf("Found number: %i at row %i col %i | ", number, row+1, col+1); // one-indexed print
                     sud->matrix[row][col] = number;
@@ -438,8 +442,7 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
     sudTarget->solveIterations = sudToCopy->solveIterations;
     sudTarget->totalUnsolved = sudToCopy ->totalUnsolved;
     
-
-    // What with boxlist and matrix?
+    // Deep copy matrix & remake boxList
 
     //Allocate space for matrix
     int **matrix = (int **)saferCalloc(sudToCopy->rowLength, sizeof(int*)); // Dynamically allocate pointers to an array.
@@ -447,6 +450,7 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
         matrix[i] = (int *)saferCalloc(sudToCopy->colLength, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
     sudTarget->matrix = matrix;
+
     for (int row = 0; row < sudToCopy->rowLength; row++)
     {
         for (int col = 0; col < sudToCopy->colLength; col++)
@@ -503,8 +507,9 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
        {
            for (int boxHorizontal = 0; boxHorizontal < sud->boxWidth; boxHorizontal++)
            {
-               curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount;
+               curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount; // BUG: curBoxUnsolvedCount does not change when it's filled in
                if (curBoxUnsolvedCount < minBoxUnsolvedCount && curBoxUnsolvedCount > 1) // There has to be more than 1 unsolved in the box
+               // Optimization: If curBoxUnsolvedCount == 2, then break the loop; there will not be a lower value found.
                {
                    // If lowest count, make min box the current box
                    minBoxVertical = boxVertical;
@@ -520,7 +525,13 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound, int numbersToFind)
 
         // Within the most constrained box, look for the field with the lowest possibilities
         int lowestFieldPos = MAXDIMENSION+1;
-        int lowestPosArray[sud->colLength + 1];
+        int lowestPosArray[sud->colLength + 1]; // Initialize this to all -1;
+
+        for (int i = 0; i < sud->colLength + 1; i++)
+        {
+            lowestPosArray[i] = -1;
+        }
+
         int lowestFieldRow = MAXDIMENSION + 1;
         int lowestFieldCol = MAXDIMENSION + 1;
 
@@ -687,16 +698,14 @@ int outputSudoku(struct sudoku *sud)
 
 int main(void){
     //TODO: Enable queuing sudokus
-    //TODO: add flag for algo choice & iterations
 
     int algoChoice = 1;
-    
     int iterations = MAXITERATIONS; // default iterations
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
     int numbersToFind = MAXITERATIONS; // BUG: Does not solve complete Matrix before providing numbers. Now it can give the wrong numbers!
 
     // Init vars
-    char filename[] = "sudoku_input_medium.txt";
+    char filename[] = "sudoku_input_medium2.txt";
     
     // Process per Sudoku
 
