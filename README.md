@@ -32,7 +32,7 @@ x Implement backtracking algorithm
 
 x BUG: The backtracking algo only looks at the first box. 
 
-- BUG: Solve prints multiple times (because backtrack recursively calls it)
+x BUG: Solve prints multiple times (because backtrack recursively calls it)
 
 x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 

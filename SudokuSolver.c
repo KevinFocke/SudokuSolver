@@ -432,9 +432,9 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
             {
                 if (posArray[number] == 0) // If the number has not been used yet
                 {
-                    printf("Found number: %i at row %i col %i | ", number, row+1, col+1); // one-indexed print
+                    // printf("Found number: %i at row %i col %i | ", number, row+1, col+1); // one-indexed print
                     sud->matrix[row][col] = number;
-                    printf("\n");
+                    // printf("\n");
                     // printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
                     *numbersFound += 1;
                     sud->numbersFoundTotal += 1;
@@ -608,7 +608,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
                     struct sudoku *sudTemp = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku));
                     deepCopySud(sud,sudTemp);
                     sudTemp->matrix[lowestFieldRow][lowestFieldCol] = number;
-                    printf("\n \n Trying new Matrix via backtracking \n \n");
+                    // printf("Trying new Matrix via backtracking\n");
                     // printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
                     *numbersFound += 1;
                     sudTemp->backtrackIterations += 1;
@@ -624,7 +624,6 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
                         deepCopySud(sudTemp, sud); // The temp sudoku is the real sudoku!
-                        printf("Backtracking found a complete sudoku \n");
                         *numbersFound = 0; // BUG: Overcounts number by 1, temp fix
                         return 0;
                     }
@@ -677,11 +676,11 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
 
     */ 
 
-    for (int i = 0; i < MAXITERATIONS; i++)
+    for (int i = sud->solveIterations; i < MAXITERATIONS; i++) // TODO: Refactor maxiterations per sudoku
     {
         int numbersFound = 0; // How many numbers were found this iteration?
         sud->solveIterations += 1;
-        printf("Current iteration: %i \n", sud->solveIterations);
+        // printf("Current iteration: %i \n", sud->solveIterations);
     
         (*algoMethod[algoChoice])(sud, &numbersFound); // Solve using the chosen algoMethod
 
@@ -691,21 +690,16 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
         if (sud->numbersFoundTotal == sud->initialUnsolved)
         {
             // printf("All numbers were found! \n"); // backtrack base cases
-            if (sud->backtrackIterations != 0)
-            {
-                printf("The code backtracked %i times \n", sud->backtrackIterations);
-            }
-            printf("Solving took %i iterations \n", sud->solveIterations);
             return 0;
         }
         else
         {
-            printf("Algorithm did not find all numbers. \n");
+            // printf("Algorithm did not find all numbers. \n");
             return 1;
         }
     }
 
-    printf("Amount of numbers found this iteration: %i \n", numbersFound);
+    // printf("Amount of numbers found this iteration: %i \n", numbersFound);
     }
 
 
@@ -714,14 +708,29 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
 
 int outputSudoku(struct sudoku *sud)
 {
+    // print stats
+    printf("\n\n\n");
+
+    if (sud->backtrackIterations != 0)
+    {
+        printf("The code backtracked %i times \n", sud->backtrackIterations);
+    }
+
+    printf("Solving took %i iterations \n", sud->solveIterations);
+    if (sud->solveIterations == MAXITERATIONS)
+    {
+        printf("Stopped attempting to solve because  iterations reached.");
+    }
+    
     if (sud->totalUnsolved == 0)
     {
+    // print result
     printf("\nSudoku Solved:\n");
     printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     }
     else
     {
-        printf("Solution not found. Solved %i out of %i\n Sudoku:\n", sud->numbersFoundTotal, sud->initialUnsolved);
+        printf("Solution not found. \n Sudoku:\n");
         printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
     }
 
