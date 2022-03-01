@@ -13,7 +13,7 @@
 
 // Max supported sudoku is 9 x 9
 const int MAXDIMENSION = 9; // Max dimension of sudoku
-const int MAXITERATIONS = 10000;
+const int MAXITERATIONS = 100000000; 
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
 
@@ -717,9 +717,9 @@ int outputSudoku(struct sudoku *sud)
     }
 
     printf("Solving took %i iterations \n", sud->solveIterations);
-    if (sud->solveIterations == MAXITERATIONS)
+    if (sud->solveIterations >= MAXITERATIONS)
     {
-        printf("Stopped attempting to solve because  iterations reached.");
+        printf("Stopped attempting to solve sudoku because maximum iterations reached.");
     }
     
     if (sud->totalUnsolved == 0)
@@ -746,7 +746,7 @@ int main(void){
     // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input_medium2.txt";
+    char filename[] = "sudoku_input_medium3.txt";
     
     // Process per Sudoku
 

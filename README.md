@@ -57,6 +57,8 @@ Ver 3:
 - Add test cases
 - Track bugs outside of the code (github? elsewhere?)
 
+BUG: Fix overcounting of MAXITERATIONS (can go above limit);
+
 Ver 4:
 - Host online version of the sudoku maker and solver.
 - Add cloud computing support
