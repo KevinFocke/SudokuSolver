@@ -95,7 +95,7 @@ hash: // takes a hash from the matrix and (if defined) the boxmatrix
 
 comment: // optional comment about the sudoku
 
-# can be used for comments. Everything after the # will not be interpreted on the line. 
+\# can be used for comments. Everything after the # will not be interpreted on the line. 
 
 - feat keywords also get copied into the output file + records get added "stats" & "solved".
 
