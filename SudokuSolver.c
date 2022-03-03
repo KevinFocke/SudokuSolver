@@ -257,16 +257,16 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *filename, int *size, int *sudokuArray, int *dataDimension)
+int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension)
 {
-    // TODO: Regex to set custom filename
+    // TODO: Regex to set custom inputFilename
     // readGit source control manager in the file
     FILE *fp;
-    fp = fopen(filename, "r");
+    fp = fopen(inputFilename, "r");
 
 
     *size = 0;
-    printf("Scanning %s\n", filename);
+    printf("Scanning %s\n", inputFilename);
     // TODO : Detect non-numeric characters
     int buffer = 0;
     while (fscanf(fp, "%d", &buffer) != EOF){
@@ -737,7 +737,7 @@ int main(void){
     int algoChoice = 1;
 
     // Init vars
-    char filename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
+    char inputFilename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
     
     // Process per Sudoku
 
@@ -751,7 +751,7 @@ int main(void){
     }
 
     //Function calls
-    if (readFile(filename, &size, sudokuArray, &dataDimension))
+    if (readFile(inputFilename, &size, sudokuArray, &dataDimension))
     {
         printf("Failed to read file.");
         exit(1); // TODO: change in case of queued sudoku's, break?

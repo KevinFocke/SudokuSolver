@@ -39,7 +39,6 @@ x BUG: The sudTemp does not replace the sud downstream. // Solved by making a de
 x Cleanup checkBox, unused vars matrixRow + matrixCol
 
 x Rename dataCount var to size
-
 - Rename filename to inputFilename
 
 - Add command line recognition of flags, filename=mytext.txt 
