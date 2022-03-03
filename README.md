@@ -1,6 +1,7 @@
 # SudokuSolver
 
-Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. Feedback welcome!
+Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. 
+Feedback welcome!
 
 Ver 1: 
 
