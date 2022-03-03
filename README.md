@@ -39,7 +39,8 @@ x BUG: The sudTemp does not replace the sud downstream. // Solved by making a de
 x Cleanup checkBox, unused vars matrixRow + matrixCol
 
 x Rename dataCount var to size
-- Rename filename to inputFilename
+
+x Rename filename to inputFilename
 
 - Add command line recognition of flags, filename=mytext.txt 
 
@@ -63,20 +64,6 @@ If a number is bigger than 10 you can either use the numeric value or English al
 
 The interpreter keeps reading input until either a new keyword is detected, "%% \n", or the end of file is reached.
 
-Other (optional) keywords are possible:
-
-name: Newspaper_02_03_2022 //the name of the sudoku.
-dimensions: 9 x 9 // Format is rowDimension x colDimension. Used as a double check. 
-boxmatrix: // Used in snake matrix, for every number include which box it belongs to. To improve the readability of the input file, put the boxmatrix directly under the matrix
-source: // where was the sudoku found?
-method: // how was the sudoku fetched?
-screenshot: // link to a screenshot of the sudoku 
-hash: // takes a hash from the matrix and (if defined) the boxmatrix
-comment: // optional comment about the sudoku
-
-# can be used for comments. Everything after the # will not be interpreted on the line. 
-
-All keywords also get copied into the output file + records get added "stats" & "solved".
 
 Ver 3:
 - Add automated test cases via CI
@@ -89,6 +76,29 @@ Ver 3:
 - feat compare initial sudoku vs end sudoku, highlight changed values in red.
 
 Ver 4:
+
+- feat add optional input keywords; add array of optional keywords encapsulated in struct sudoku:
+
+name: Newspaper_02_03_2022 //the name of the sudoku.
+
+dimensions: 9 x 9 // Format is rowDimension x colDimension. Used as a double check. 
+
+boxmatrix: // Used in snake matrix, for every number include which box it belongs to. To improve the readability of the input file, put the boxmatrix directly under the matrix
+
+source: // where was the sudoku found?
+
+method: // how was the sudoku fetched?
+
+screenshot: // link to a screenshot of the sudoku 
+
+hash: // takes a hash from the matrix and (if defined) the boxmatrix
+
+comment: // optional comment about the sudoku
+
+# can be used for comments. Everything after the # will not be interpreted on the line. 
+
+- feat keywords also get copied into the output file + records get added "stats" & "solved".
+
 - Create automated benchmarking of algos.
 - Add optimized Algo (checks the ROW + COL of diagonal instead of every field)
 - Refactor input error detection; using fgets and regex

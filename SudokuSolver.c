@@ -118,7 +118,6 @@ int countBoxUnsolved(struct box *box)
 
 }
 
-
 int countSudUnsolved(struct sudoku *sud)
 {
     // Count unsolved entries
@@ -257,13 +256,13 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension)
+int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension, int *streamPos)
 {
     // TODO: Regex to set custom inputFilename
-    // readGit source control manager in the file
     FILE *fp;
     fp = fopen(inputFilename, "r");
 
+    fsetpos(fp, *streamPos); // Set position within stream (for reading in multiple sudokus)
 
     *size = 0;
     printf("Scanning %s\n", inputFilename);
@@ -292,6 +291,9 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
         printf("\n Invalid size. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*size,MAXDIMENSION);
         exit(1);
     }
+
+    *streamPos = ftell(fp); // Remember position within stream (for reading in multile sudokus)
+    // printf("StreamPos %i", *streamPos);
 
     return 0;
 }
@@ -738,11 +740,11 @@ int main(void){
 
     // Init vars
     char inputFilename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
-    
+    int streamPos = 0; // What is the position of the current stream?
     // Process per Sudoku
 
-    int size;
-    int dataDimension; // DataDimension
+    int size = 0;
+    int dataDimension = 0; // DataDimension
     // Initialize the maximum possible sudoku array; one-dimensional
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
     for (int i = 0; i < MAXARRAY; i++)
@@ -751,7 +753,7 @@ int main(void){
     }
 
     //Function calls
-    if (readFile(inputFilename, &size, sudokuArray, &dataDimension))
+    if (readFile(inputFilename, &size, sudokuArray, &dataDimension, &streamPos))
     {
         printf("Failed to read file.");
         exit(1); // TODO: change in case of queued sudoku's, break?
