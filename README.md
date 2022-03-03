@@ -1,6 +1,6 @@
 # SudokuSolver
 
-Work-In-Progress, personal experiment to train on pointers, structs, recursion & backtracking. Feedback welcome!
+Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. Feedback welcome!
 
 Ver 1: 
 
@@ -36,39 +36,80 @@ x BUG: Solve prints multiple times (because backtrack recursively calls it)
 
 x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 
-- BUG: Backtracking keeps trying numbers even if a number cannot work.
+- Cleanup checkBox, unused vars matrixRow + matrixCol
 
-- Add command line recognizition of flags, filename=mytext.txt 
+- Rename dataCount var to size
 
-- Refactor input error detection; using fgets and regex
-https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
+- Rename filename to inputFilename
 
-- Allow queuing sudokus
+- Add command line recognition of flags, filename=mytext.txt 
 
+- Allow queuing sudokus (uses Record-Jar Format, "%% \n" for every new sudoku in the .txt file).
 
-- Check for memory leaks (valgrind)
+Under the seperator, one mandatory keyword called *sudoku* is expected. It represents the sudoku per row with each number space-delimited. Each row is on a new line. Use 0 for empty field, otherwise fill in the value. To improve readability, it's recommended to start the first row on a new line after the *sudoku* keyword.
+
+eg.
+sudoku:
+0 5 0 7 8 0 0 0 0
+9 0 8 2 3 0 7 5 6
+2 7 4 6 1 0 0 3 9
+0 4 0 9 0 0 0 0 0
+0 0 0 5 0 2 0 9 8
+0 0 2 0 0 3 1 0 7
+0 0 0 0 0 7 0 1 0
+4 3 0 0 0 0 9 0 5
+1 0 9 3 0 0 0 0 0
+
+If a number is bigger than 10 you can either use the numeric value or English alphabet letter (A is 10, B is 11, F is 15…)
+
+The interpreter keeps reading input until either a new keyword is detected, "%% \n", or the end of file is reached.
+
+Other (optional) keywords are possible:
+
+name: Newspaper_02_03_2022 //the name of the sudoku.
+dimensions: 9 x 9 // Format is rowDimension x colDimension. Used as a double check. 
+boxmatrix: // Used in snake matrix, for every number include which box it belongs to. To improve the readability of the input file, put the boxmatrix directly under the matrix
+source: // where was the sudoku found?
+method: // how was the sudoku fetched?
+screenshot: // link to a screenshot of the sudoku 
+hash: // takes a hash from the matrix and (if defined) the boxmatrix
+comment: // optional comment about the sudoku
+
+# can be used for comments. Everything after the # will not be interpreted on the line. 
+
+All keywords also get copied into the output file + records get added "stats" & "solved".
 
 Ver 3:
-- Fix solving iteration count 
+- Add automated test cases via CI
+- Support Sudoku's up to 36 x 36.
+- Track bugs outside of the code (github? elsewhere?)
 - refactor dataDimension; encapsulate within the sudoku.
 - refactor boxHorizontalBound & boxVerticalBound (encapsulate within box)
 - refactor outputSudoku to make a .txt with the final sudoku
-- compare initial sudoku vs end sudoku
-- Add test cases
-- Track bugs outside of the code (github? elsewhere?)
+- feat compare initial sudoku vs end sudoku, highlight changed values in red.
+
+Ver 4:
+- Create automated benchmarking of algos.
+- Add optimized Algo (checks the ROW + COL of diagonal instead of every field)
+- Refactor input error detection; using fgets and regex
+https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
+
+- Check for memory leaks (valgrind)
 
 BUG: Fix overcounting of MAXITERATIONS (can go above limit);
 
-Ver 4:
-- Host online version of the sudoku maker and solver.
-- Add cloud computing support
-
 Ver 5:
-- Add photo mode, make picture of sudoku, translates into matrix
+- Add photo mode in Python, make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
-- Convert ints to a shorter type depending on needed number range?
+- Support Samurai Sudoku
+- Support Snake Matrix (using boxmatrix record)
 
-*/
+Ver 6:
+- Create GUI for sudoku solver
+- Precompute sudoku's and their solutions
+- Add hint system
+- Host online version of the sudoku maker and solver.
+- Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm
 
 Lessons learned:
 

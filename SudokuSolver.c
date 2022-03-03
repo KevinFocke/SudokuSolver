@@ -1,18 +1,15 @@
-//TODO: Debug Backtracking, why can it not find medium2 & difficult solutions?
+// Sudoku Solver 
 
-// Sudoku Solver
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <stdbool.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-// Max supported sudoku is 9 x 9
-const int MAXDIMENSION = 9; // Max dimension of sudoku
+const int MAXDIMENSION = 36; // Max dimension of sudoku. >9 is experimental.
 const int MAXITERATIONS = 100000000; 
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
@@ -45,7 +42,6 @@ struct box
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
-
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
@@ -302,8 +298,6 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimensio
 
 int checkRow(struct sudoku *sud, int number, int matrixRow)
 {
-   /* If you check row, the row is fixed, col variablet & vice versa. */ 
-
     for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
     {
         if (sud->matrix[matrixRow][varDimension] == number)
@@ -317,8 +311,6 @@ int checkRow(struct sudoku *sud, int number, int matrixRow)
 
 int checkCol(struct sudoku *sud, int number, int matrixCol)
 {
-   /* If you check row, the row is fixed, col variablet & vice versa. */ 
-
     for (int varDimension = 0; varDimension < sud->rowLength; varDimension++) // iterate over rows
     {
         if (sud->matrix[varDimension][matrixCol] == number)
@@ -743,17 +735,16 @@ int main(void){
     //TODO: Enable queuing sudokus
 
     int algoChoice = 1;
-    // int numbersToFind = MAXDIMENSION * MAXDIMENSION;
 
     // Init vars
-    char filename[] = "sudoku_input_medium3.txt";
+    char filename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
     
     // Process per Sudoku
 
     int dataCount;
     int dataDimension; // DataDimension
     // Initialize the maximum possible sudoku array; one-dimensional
-    int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug is -1.
+    int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
     for (int i = 0; i < MAXARRAY; i++)
     {
         sudokuArray[i] = -1; 
@@ -763,7 +754,7 @@ int main(void){
     if (readFile(filename, &dataCount, sudokuArray, &dataDimension))
     {
         printf("Failed to read file.");
-        exit(1);
+        exit(1); // TODO: change in case of queued sudoku's, break?
     }
     
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
@@ -772,7 +763,7 @@ int main(void){
     initSudoku(&dataCount,&dataDimension, sudokuArray, sud) ;
     solveSudoku(sud, algoChoice);
     outputSudoku(sud);
-    free(sud); 
+    free(sud);
 
     return 0; // main finished succesfully 
 }
