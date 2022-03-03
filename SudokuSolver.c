@@ -257,7 +257,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimension)
+int readFile(char *filename, int *size, int *sudokuArray, int *dataDimension)
 {
     // TODO: Regex to set custom filename
     // readGit source control manager in the file
@@ -265,7 +265,7 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimensio
     fp = fopen(filename, "r");
 
 
-    *dataCount = 0;
+    *size = 0;
     printf("Scanning %s\n", filename);
     // TODO : Detect non-numeric characters
     int buffer = 0;
@@ -274,13 +274,13 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimensio
             printf("\n Detected negative number.");
             exit(1);
             }
-        sudokuArray[*dataCount] = buffer; // put current int in array
-        *dataCount += 1;
+        sudokuArray[*size] = buffer; // put current int in array
+        *size += 1;
     }
 
     for (int i = 1; i <= MAXDIMENSION; i++)
     {
-        if (*dataCount == i * i)
+        if (*size == i * i)
         {
             *dataDimension = i;
             break;
@@ -289,7 +289,7 @@ int readFile(char *filename, int *dataCount, int *sudokuArray, int *dataDimensio
 
     if (*dataDimension == 0)
     {
-        printf("\n Invalid dataCount. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*dataCount,MAXDIMENSION);
+        printf("\n Invalid size. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*size,MAXDIMENSION);
         exit(1);
     }
 
@@ -741,7 +741,7 @@ int main(void){
     
     // Process per Sudoku
 
-    int dataCount;
+    int size;
     int dataDimension; // DataDimension
     // Initialize the maximum possible sudoku array; one-dimensional
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
@@ -751,7 +751,7 @@ int main(void){
     }
 
     //Function calls
-    if (readFile(filename, &dataCount, sudokuArray, &dataDimension))
+    if (readFile(filename, &size, sudokuArray, &dataDimension))
     {
         printf("Failed to read file.");
         exit(1); // TODO: change in case of queued sudoku's, break?
@@ -760,7 +760,7 @@ int main(void){
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
     
-    initSudoku(&dataCount,&dataDimension, sudokuArray, sud) ;
+    initSudoku(&size,&dataDimension, sudokuArray, sud) ;
     solveSudoku(sud, algoChoice);
     outputSudoku(sud);
     free(sud);

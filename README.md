@@ -36,9 +36,9 @@ x BUG: Solve prints multiple times (because backtrack recursively calls it)
 
 x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
 
-- Cleanup checkBox, unused vars matrixRow + matrixCol
+x Cleanup checkBox, unused vars matrixRow + matrixCol
 
-- Rename dataCount var to size
+x Rename dataCount var to size
 
 - Rename filename to inputFilename
 
