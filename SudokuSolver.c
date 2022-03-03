@@ -322,7 +322,7 @@ int checkCol(struct sudoku *sud, int number, int matrixCol)
     return 0; // No result found
 }
 
-int checkBox(struct sudoku *sud, int number, int matrixRow, int matrixCol, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
+int checkBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
 {
     int curValue = 0;
     for (int row = 0; row < verticalBound; row ++)
@@ -369,7 +369,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the box
-            else if (checkBox(sud, number, row, col, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+            else if (checkBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;

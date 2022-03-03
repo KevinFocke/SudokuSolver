@@ -81,6 +81,7 @@ All keywords also get copied into the output file + records get added "stats" & 
 
 Ver 3:
 - Add automated test cases via CI
+- Add automated security testing 
 - Support Sudoku's up to 36 x 36.
 - Track bugs outside of the code (github? elsewhere?)
 - refactor dataDimension; encapsulate within the sudoku.
@@ -94,6 +95,7 @@ Ver 4:
 - Refactor input error detection; using fgets and regex
 https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
 
+- Create fixed-width ints to improve  portability(int32_t instead of int)
 - Check for memory leaks (valgrind)
 
 BUG: Fix overcounting of MAXITERATIONS (can go above limit);
