@@ -256,14 +256,15 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension, int *streamPos)
+int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension, fpos_t *streamPos)
 {
     // TODO: Regex to set custom inputFilename
     FILE *fp;
     fp = fopen(inputFilename, "r");
+    
+    const fpos_t curStreamPos = *streamPos;
 
-    fsetpos(fp, *streamPos); // Set position within stream (for reading in multiple sudokus)
-
+    fsetpos(fp, &curStreamPos); // Set position within stream (for reading in multiple sudokus)
     *size = 0;
     printf("Scanning %s\n", inputFilename);
     // TODO : Detect non-numeric characters
@@ -292,8 +293,8 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
         exit(1);
     }
 
-    *streamPos = ftell(fp); // Remember position within stream (for reading in multile sudokus)
-    // printf("StreamPos %i", *streamPos);
+    fgetpos(fp, streamPos); // Remember position within stream (for reading in multile sudokus)
+    // printf("StreamPos %lli \n", *streamPos);
 
     return 0;
 }
@@ -733,19 +734,96 @@ int outputSudoku(struct sudoku *sud)
 
     return 0;}
 
-int main(void){
+int matchPattern(char *pattern, char *stringToSearch, int *posBeginMatch, int *posEndMatch)
+{
+
+    /* Takes two strings, matches the first instance & saves the beginning position + end position.
+    
+    Check string for '\0' or space ' '
+    */
+    int patternLen = strlen(pattern);
+    int stringToSearchLen = strlen(stringToSearch);
+    int curMatchedLen = 0; // What is the current in-order match count?
+
+    if (stringToSearchLen < patternLen)
+    {
+        return 1; // a full pattern cannot be found in a smaller string
+    }
+
+    for (int charIndex = 0; charIndex < stringToSearchLen; charIndex++) // Search full string
+    {
+        if (stringToSearch[charIndex] == pattern[0]) // if first char of patter and string matches, then lookahead
+        {
+            curMatchedLen += 1; // matched the first char
+
+            for (int innerCharIndex = 1; innerCharIndex < patternLen; innerCharIndex++) // Start at next char, match until end of pattern
+            {
+                if (stringToSearch[charIndex + innerCharIndex] == pattern[innerCharIndex])
+                {
+                    curMatchedLen += 1;
+                }
+                else // not fully matched in-order
+                {
+                    charIndex = charIndex + innerCharIndex; // jump the charIndex ahead to avoid redundant work
+                    curMatchedLen = 0; // reset cur max length
+                    break; // break innerChar loop, string not found during lookahead
+                }
+                if (curMatchedLen == patternLen)
+                {
+                    *posBeginMatch = charIndex;
+                    *posEndMatch = charIndex + innerCharIndex; // Set posEndMatch to the pos of last char
+                    return 0; // pattern has been matched!
+                }
+
+
+            }
+
+
+            
+        }
+    }
+
+    return 1; // pattern has not been matched
+}
+
+int testCases()
+{
+    // 
+}
+int main(int argc, char *argv[]){
     //TODO: Enable queuing sudokus
 
-    int algoChoice = 1;
-
-    // Init vars
+    // Default vars, can be overriden using command line flags
     char inputFilename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
-    int streamPos = 0; // What is the position of the current stream?
+    int algoChoice = 1;
+    fpos_t streamPos = 0; // What is the position of the current stream?
+    int tests = 1;
     // Process per Sudoku
+    // Take in command line arguments
+
+    char flagFilename[] = "-filename=";
+    char flagAlgoChoice[] = "-algoChoice=";
+    char flagStreamPos[] = "-streamPos=";
+    char flagTests[] = "-tests=";
+
+
+    if (argc > 1) // function called with flags
+    {
+        // interpret flags
+        for (int flagArg = 1; flagArg < argc; flagArg++)
+        {
+            int posEndMatch = -1; // In case of match, where does the match end in the stringToSearch?
+            int posBeginMatch = -1; // In case of match, where does the match begin in the stringToSearch?
+            matchPattern(flagFilename, argv[flagArg],&posBeginMatch, &posEndMatch); // does the argv match a flag?
+            {
+                // match --filename \spacechar,
+            }
+        }
+    }
+
 
     int size = 0;
     int dataDimension = 0; // DataDimension
-    // Initialize the maximum possible sudoku array; one-dimensional
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
     for (int i = 0; i < MAXARRAY; i++)
     {
