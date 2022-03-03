@@ -739,33 +739,18 @@ int main(int argc, char *argv[]){
     //TODO: Enable queuing sudokus
 
     // Default vars, can be overriden using command line flags
-    char inputFilename[] = "sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
+    char inputFilename[] = "Input_Cases/Individual/sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
     int algoChoice = 1;
     fpos_t streamPos = 0; // What is the position of the current stream?
     int tests = 1;
 
     // Interpret command line arguments
 
-    // TODO: Automatically prepend - and append = to flag
-    char flagFilename[] = "-filename=";
+
+    /*char flagFilename[] = "-filename=";
     char flagAlgoChoice[] = "-algoChoice=";
     char flagStreamPos[] = "-streamPos=";
-    char flagTests[] = "-tests=";
-
-    if (argc > 1) // function called with flags
-    {
-        // interpret flags
-        for (int flagArg = 1; flagArg < argc; flagArg++)
-        {
-            /*
-            int *matchPointer = strstr(argv[flagArg],flagFilename); // returns a pointer to first char of found substring in str
-            if (NULL != matchPointer) 
-            {
-
-            }
-            */
-        }
-    }
+    char flagTests[] = "-tests=";*/
 
     int size = 0;
     int dataDimension = 0; // DataDimension

@@ -42,8 +42,6 @@ x Rename dataCount var to size
 
 x Rename filename to inputFilename
 
-- Add command line recognition of flags, filename=mytext.txt 
-
 - Allow queuing sudokus (uses Record-Jar Format, "%% \n" for every new sudoku in the .txt file).
 
 Under the seperator, one mandatory keyword called *sudoku* is expected. It represents the sudoku per row with each number space-delimited. Each row is on a new line. Use 0 for empty field, otherwise fill in the value. To improve readability, it's recommended to start the first row on a new line after the *sudoku* keyword.
@@ -66,6 +64,7 @@ The interpreter keeps reading input until either a new keyword is detected, "%% 
 
 
 Ver 3:
+- Start developing on a linux environment
 - Add automated test cases via CI
 - Add automated security testing 
 - Support Sudoku's up to 36 x 36.
@@ -76,6 +75,7 @@ Ver 3:
 - feat compare initial sudoku vs end sudoku, highlight changed values in red.
 
 Ver 4:
+
 
 - feat add optional input keywords; add array of optional keywords encapsulated in struct sudoku:
 
@@ -116,6 +116,7 @@ Ver 5:
 - Support Snake Matrix (using boxmatrix record)
 
 Ver 6:
+- Add command line recognition of flags, filename=mytext.txt (<argph.h> library)
 - Create GUI for sudoku solver
 - Precompute sudoku's and their solutions
 - Add hint system
