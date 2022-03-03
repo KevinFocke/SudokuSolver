@@ -264,7 +264,8 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
     
     const fpos_t curStreamPos = *streamPos;
 
-    fsetpos(fp, &curStreamPos); // Set position within stream (for reading in multiple sudokus)
+    fsetpos(fp, &curStreamPos); // Set position within stream (for reading in multiple sudokus
+
     *size = 0;
     printf("Scanning %s\n", inputFilename);
     // TODO : Detect non-numeric characters
@@ -734,62 +735,6 @@ int outputSudoku(struct sudoku *sud)
 
     return 0;}
 
-int matchPattern(char *pattern, char *stringToSearch, int *posBeginMatch, int *posEndMatch)
-{
-
-    /* Takes two strings, matches the first instance & saves the beginning position + end position.
-    
-    Check string for '\0' or space ' '
-    */
-    int patternLen = strlen(pattern);
-    int stringToSearchLen = strlen(stringToSearch);
-    int curMatchedLen = 0; // What is the current in-order match count?
-
-    if (stringToSearchLen < patternLen)
-    {
-        return 1; // a full pattern cannot be found in a smaller string
-    }
-
-    for (int charIndex = 0; charIndex < stringToSearchLen; charIndex++) // Search full string
-    {
-        if (stringToSearch[charIndex] == pattern[0]) // if first char of patter and string matches, then lookahead
-        {
-            curMatchedLen += 1; // matched the first char
-
-            for (int innerCharIndex = 1; innerCharIndex < patternLen; innerCharIndex++) // Start at next char, match until end of pattern
-            {
-                if (stringToSearch[charIndex + innerCharIndex] == pattern[innerCharIndex])
-                {
-                    curMatchedLen += 1;
-                }
-                else // not fully matched in-order
-                {
-                    charIndex = charIndex + innerCharIndex; // jump the charIndex ahead to avoid redundant work
-                    curMatchedLen = 0; // reset cur max length
-                    break; // break innerChar loop, string not found during lookahead
-                }
-                if (curMatchedLen == patternLen)
-                {
-                    *posBeginMatch = charIndex;
-                    *posEndMatch = charIndex + innerCharIndex; // Set posEndMatch to the pos of last char
-                    return 0; // pattern has been matched!
-                }
-
-
-            }
-
-
-            
-        }
-    }
-
-    return 1; // pattern has not been matched
-}
-
-int testCases()
-{
-    // 
-}
 int main(int argc, char *argv[]){
     //TODO: Enable queuing sudokus
 
@@ -798,29 +743,29 @@ int main(int argc, char *argv[]){
     int algoChoice = 1;
     fpos_t streamPos = 0; // What is the position of the current stream?
     int tests = 1;
-    // Process per Sudoku
-    // Take in command line arguments
 
+    // Interpret command line arguments
+
+    // TODO: Automatically prepend - and append = to flag
     char flagFilename[] = "-filename=";
     char flagAlgoChoice[] = "-algoChoice=";
     char flagStreamPos[] = "-streamPos=";
     char flagTests[] = "-tests=";
-
 
     if (argc > 1) // function called with flags
     {
         // interpret flags
         for (int flagArg = 1; flagArg < argc; flagArg++)
         {
-            int posEndMatch = -1; // In case of match, where does the match end in the stringToSearch?
-            int posBeginMatch = -1; // In case of match, where does the match begin in the stringToSearch?
-            matchPattern(flagFilename, argv[flagArg],&posBeginMatch, &posEndMatch); // does the argv match a flag?
+            /*
+            int *matchPointer = strstr(argv[flagArg],flagFilename); // returns a pointer to first char of found substring in str
+            if (NULL != matchPointer) 
             {
-                // match --filename \spacechar,
+
             }
+            */
         }
     }
-
 
     int size = 0;
     int dataDimension = 0; // DataDimension
