@@ -1,6 +1,8 @@
 # SudokuSolver
 
-Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. Feedback welcome!
+Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. 
+
+Feedback welcome!
 
 Program structure:
 1. Read in .txt file
