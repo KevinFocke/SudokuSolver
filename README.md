@@ -11,7 +11,7 @@ Program structure:
 4. Output the sudoku to terminal
 
 Implemented algorithms:
-- simpleAlgo: For each row & col, check the row, check the col, check the box. Simple but inefficient.
+- simpleAlgo: For each row & col, check the row, check the col, check the box.
 - backtrackAlgo: Find numbers using simpleAlgo. If no further numbers are found, find the most constrained box with >= 1 available fields. Within this field, try each possibility by recursively calling backtrackAlgo until a solution is found. If the possibilities are exhausted & the sudoku remains unsolved, backtrack to an earlier version & try other possibilities.
 
 Ver 1: 
