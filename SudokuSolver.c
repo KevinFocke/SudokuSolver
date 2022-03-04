@@ -531,7 +531,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
            for (int boxHorizontal = 0; boxHorizontal < sud->boxWidth; boxHorizontal++)
            {
                countBoxUnsolved(&(sud->boxList[boxVertical][boxHorizontal]));
-               curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount; // BUG: curBoxUnsolvedCount does not change when it's filled in
+               curBoxUnsolvedCount = sud->boxList[boxVertical][boxHorizontal].unsolvedCount;
                if (curBoxUnsolvedCount < minBoxUnsolvedCount && curBoxUnsolvedCount > 1) // There has to be more than 1 unsolved in the box
                // Optimization: If curBoxUnsolvedCount == 2, then break the loop; there will not be a lower value found.
                {

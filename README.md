@@ -2,6 +2,16 @@
 
 Work-In-Progress, personal experiment to train on pointers, structs, recursion, backtracking & more. Feedback welcome!
 
+Program structure:
+1. Read in .txt file
+2. Initialize sudoku structure
+3. Solve sudoku using a chosen algorithm
+4. Output the sudoku to terminal
+
+Implemented algorithms:
+- simpleAlgo: For each row & col, check the row, check the col, check the box. Simple but inefficient.
+- backtrackAlgo: Find numbers using simpleAlgo. If no further numbers are found, find the most constrained box with >= 1 available fields. Within this field, try each possibility by recursively calling backtrackAlgo until a solution is found. If the possibilities are exhausted & the sudoku remains unsolved, backtrack to an earlier version & try other possibilities.
+
 Ver 1: 
 
 x Create a program that solves simple sudokus inefficiently.
@@ -47,15 +57,25 @@ x Rename filename to inputFilename
 Under the seperator, one mandatory keyword called *sudoku* is expected. It represents the sudoku per row with each number space-delimited. Each row is on a new line. Use 0 for empty field, otherwise fill in the value. To improve readability, it's recommended to start the first row on a new line after the *sudoku* keyword.
 
 eg.
+
 sudoku:
+
 0 5 0 7 8 0 0 0 0
+
 9 0 8 2 3 0 7 5 6
+
 2 7 4 6 1 0 0 3 9
+
 0 4 0 9 0 0 0 0 0
+
 0 0 0 5 0 2 0 9 8
+
 0 0 2 0 0 3 1 0 7
+
 0 0 0 0 0 7 0 1 0
+
 4 3 0 0 0 0 9 0 5
+
 1 0 9 3 0 0 0 0 0
 
 If a number is bigger than 10 you can either use the numeric value or English alphabet letter (A is 10, B is 11, F is 15…)
