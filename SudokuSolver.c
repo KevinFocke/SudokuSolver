@@ -10,7 +10,7 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 const int MAXDIMENSION = 36; // Max dimension of sudoku. >9 is experimental.
-const int MAXITERATIONS = 100000000; 
+const int MAXITERATIONS = 1500; 
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
 
@@ -27,7 +27,7 @@ struct sudoku
     int **matrix; // 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
     int solveIterations; // How many iterations did solve run
-    int backtrackIterations;
+    int backtrackIterations; // How many times did the algo backtrack?
 };
 
 struct box
@@ -41,6 +41,7 @@ struct box
 // prototype
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
+
 int outputSudoku(struct sudoku *sud);
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
@@ -608,7 +609,6 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
                     // printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
                     *numbersFound += 1;
                     sudTemp->backtrackIterations += 1;
-                    sudTemp->solveIterations += 1;
                     sudTemp->numbersFoundTotal += 1;
                     sudTemp->totalUnsolved -= 1;
 
@@ -627,7 +627,7 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
                     {
                         *numbersFound -= 1;
                         sud->backtrackIterations += (sudTemp->backtrackIterations) - (sud->backtrackIterations);
-                        sud->solveIterations += (sudTemp->solveIterations) - (sud->solveIterations); 
+                        sud->solveIterations += ((sudTemp->solveIterations) - (sud->solveIterations)); 
                         free(sudTemp);
                         continue;
                     }
@@ -672,7 +672,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
 
     */ 
 
-    for (int i = sud->solveIterations; i < MAXITERATIONS; i++) // TODO: Refactor maxiterations per sudoku
+    for (int i = sud->solveIterations; i < MAXITERATIONS; i++)
     {
         int numbersFound = 0; // How many numbers were found this iteration?
         sud->solveIterations += 1;
