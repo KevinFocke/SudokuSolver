@@ -1,46 +1,36 @@
-Ver 1: 
+Ver 1 - The basics: 
 
-x Create a program that solves simple sudokus inefficiently.
-
-x Refactor code into multiple subroutines
+x Create a program that solves simple sudokus inefficiently. No premature optimization!
 
 x Can read in space-delimited text files.
 
-x Sudoku struct including 2D Matrix representation. 
+x Sudoku struct includes 2D Matrix representation. 
 
-x Exit in case of error instead of return 1.
-
-x Initialize a box structure (eg 3 x 3 box in a 9 x 9 matrix)
-
-x Refactor readMatrix into own function
-
-x Double check for pointer bug in box structure.
-
-x Can solve simple sudoku
-
-x BUG: Does not find 9's
-
-Ver 2: 
+Ver 2 - Solid foundations & backtracking: 
 
 x Make extendible with different algorithms.
 
+x Refactor functions to make struct sudoku the primary data representation.
+
 x Implement backtracking algorithm
 
-x BUG: The backtracking algo only looks at the first box. 
+- Refactor initSudoku (size & dataDimension).
 
-x BUG: Solve prints multiple times (because backtrack recursively calls it)
+- Refactor struct sudoku (totalUnsolved is redundant because of numbersFoundTotal)
 
-x BUG: The sudTemp does not replace the sud downstream. // Solved by making a deepCopy
+- Refactor initBoxMatrix (current implementation assumes a square box, should allow rectangles in preparation of snake sudoku) 
 
-x Cleanup checkBox, unused vars matrixRow + matrixCol
+- Refactor initBoxList (current implementation assumes a sq)
 
-x Rename dataCount var to size
+- Refactor printMatrix to use sudoku struct
 
-x Rename filename to inputFilename
+- Refactor dataDimension; encapsulate within the sudoku.
 
-- Allow queuing sudokus (uses Record-Jar Format, "%% \n" for every new sudoku in the .txt file).
+- Refactor boxHorizontalBound & boxVerticalBound (encapsulate within box)
 
-Under the seperator, one mandatory keyword called *sudoku* is expected. It represents the sudoku per row with each number space-delimited. Each row is on a new line. Use 0 for empty field, otherwise fill in the value. To improve readability, it's recommended to start the first row on a new line after the *sudoku* keyword.
+- Allow queuing sudokus (uses Record-Jar Format, "%% \n" for every new sudoku in the .txt file). Principle: "Be generous in what you accept, rigorous in what you emit."
+
+Under the seperator, one mandatory keyword called *sudoku* is expected. It represents the sudoku per row with each number space-delimited. Each row is on a new line. Use 0 for empty field, otherwise fill in the value. To improve readability, the first row starts on a new line after the *sudoku* keyword.
 
 eg.
 
@@ -68,65 +58,59 @@ If a number is bigger than 10 you can either use the numeric value or English al
 
 The interpreter keeps reading input until either a new keyword is detected, "%% \n", or the end of file is reached.
 
-TODO: Copy this to README.md ^ 
+- TODO: Copy this to README.md ^ (formatting under program structure, input formatting)
 
-
-Ver 3:
-- Start developing on a linux environment
-- Add automated test cases via CI
-- Add automated security testing 
 - Support Sudoku's up to 36 x 36.
+
+
+Ver 3 - Testing + Documentation:
+- Start developing on a linux environment (New WSL window)
+- Add progress bar in terminal
+- Add command line recognition of flags, filename=mytext.txt (<argp.h> library, compiled using gcc, part of glibc library)
+- Add automated test cases via CI (Jenkins, Travis CI, Buddy)
+- Add automated security testing (WhiteSource Bolt, Snyk)
 - Track bugs outside of the code (github? elsewhere?)
-- refactor dataDimension; encapsulate within the sudoku.
-- refactor boxHorizontalBound & boxVerticalBound (encapsulate within box)
-- refactor outputSudoku to make a .txt with the final sudoku
+- feat outputSudoku creates a .txt with the final sudoku & input attributes.
 - feat compare initial sudoku vs end sudoku, highlight changed values in red.
+- readFile, prevent octal interpretation of code. (013 being interpreted as 1 * 8 + 3 * 1 = 11)
 
 Ver 4:
 
-
 - feat add optional input keywords; add array of optional keywords encapsulated in struct sudoku:
 
-name: Newspaper_02_03_2022 //the name of the sudoku.
+name: 
+Newspaper_Sudoku_02_03_2022 //the name of the sudoku.
 
-dimensions: 9 x 9 // Format is rowDimension x colDimension. Used as a double check. 
+boxmatrix: 
+// Used in snake matrix, for every number include which box it belongs to. To improve the readability of the input file, put the boxmatrix directly under the matrix
 
-boxmatrix: // Used in snake matrix, for every number include which box it belongs to. To improve the readability of the input file, put the boxmatrix directly under the matrix
+source: 
+// where was the sudoku found?
 
-source: // where was the sudoku found?
+method: 
+// how was the sudoku fetched?
 
-method: // how was the sudoku fetched?
+screenshot: 
+// link to a screenshot of the sudoku 
 
-screenshot: // link to a screenshot of the sudoku 
-
-hash: // takes a hash from the matrix and (if defined) the boxmatrix
-
-comment: // optional comment about the sudoku
+hash: 
+// takes a hash from the matrix and (if defined) the boxmatrix
 
 \# can be used for comments. Everything after the # will not be interpreted on the line. 
 
 - feat keywords also get copied into the output file + records get added "stats" & "solved".
 
-- Create automated benchmarking of algos.
-- Add optimized Algo (checks the ROW + COL of diagonal instead of every field)
-- Refactor input error detection; using fgets and regex
-https://www.quora.com/What-are-some-better-alternatives-to-scanf-in-C-and-what-do-they-do-exactly
-
-- Create fixed-width ints to improve  portability(int32_t instead of int)
 - Check for memory leaks (valgrind)
 
-BUG: Fix overcounting of MAXITERATIONS (can go above limit);
 
 Ver 5:
-- Add photo mode in Python, make picture of sudoku, translates into matrix
+- Add photo mode by extending Python with C (https://docs.python.org/2/extending/extending.html) make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
 - Support Samurai Sudoku
 - Support Snake Matrix (using boxmatrix record)
 
 Ver 6:
-- Add command line recognition of flags, filename=mytext.txt (<argph.h> library)
-- Create GUI for sudoku solver
-- Precompute sudoku's and their solutions
+
+- Create GUI for sudoku solver (QT?)
 - Add hint system
-- Host online version of the sudoku maker and solver.
-- Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm
+- Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm ?
