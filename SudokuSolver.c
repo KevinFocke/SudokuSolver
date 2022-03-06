@@ -10,42 +10,40 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 const int MAXDIMENSION = 36; // Max dimension of sudoku. >9 is experimental.
-const int MAXITERATIONS = 1500; 
+const int MAXITERATIONS = 1000000;  // Max iterations per sudoku
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
 
-
-// Sudoku is represented as a 2D matrix
 struct sudoku
 {
-    int size;
-    int rowLength;
-    int colLength;
-    int boxWidth; // Not compatible with snake matrix
+    int size; // total amount of numbers
+    int rowLength; // length of row
+    int colLength; // length of column
+    int boxWidth; // TODO: refactor boxWidth to prepare for snake matrix
     int totalUnsolved;
     int initialUnsolved;
-    int numbersFoundTotal;
-    int **matrix; // 2D matrix, list of pointers to arrays containing digits
-    struct box **boxList; // list of pointers to Boxes, filling from top-left to right;
-    int solveIterations; // How many iterations did solve run
-    int backtrackIterations; // How many times did the algo backtrack?
+    int numbersFoundTotal; 
+    int **matrix; // main representation; 2D matrix, list of pointers to arrays containing digits
+    struct box **boxList; // list of pointers to Boxes, filling from top-left to right
+    int solveIterations; // How many iterations did solve run?
+    int backtrackIterations; // How many times did the backtrack algo backtrack?
 };
 
 struct box
 {
     int unsolvedCount; // How many elements are currently unsolved?
     int ***pointerMatrix; // (list of pointers to arrays containing pointers)
-    int boxHorizontalBound;
-    int boxVerticalBound;
+    int boxHorizontalBound; // width of box
+    int boxVerticalBound; // height of box
 };
 
-// prototype
+// prototypes
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
-
 int outputSudoku(struct sudoku *sud);
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
+
     for (int row = 0; row < (rowLength); row++)
     {
         printf("|");
@@ -70,7 +68,7 @@ void *saferCalloc(int numOfElements, int sizeOf)
     void *memoryAddress = calloc(numOfElements,sizeOf);
     if (memoryAddress == NULL) // Check pointer
     {
-        printf("Calloc failed. Terminating program.");
+        printf("Calloc failed to allocate memory. Terminating program.");
         exit(1);
     }
     return memoryAddress;
@@ -81,7 +79,7 @@ int convertArrayDimension(int *onedimensional,  int **matrix, int dataDimension,
     row = col = 0;
     for (int i = 0; i < datacount; i++)
     {
-        if (i % (dataDimension) == 0 && i != 0) // problem: i = 0 also counts as 0.
+        if (i % (dataDimension) == 0 && i != 0)
         {
             row += 1;
             col = 0;
@@ -121,9 +119,8 @@ int countBoxUnsolved(struct box *box)
 
 int countSudUnsolved(struct sudoku *sud)
 {
-    // Count unsolved entries
+    // Counts unsolved entries in Sudoku
     int totalUnsolved = 0;
-
     int rowlength = sud->rowLength;
     int colLength = sud->colLength;
 
@@ -151,21 +148,24 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     
     a 9 x 9 Matrix will have 9 boxes:
     B B B
-    B B B   (the first B in this row has boxPosVertical 0, boxPosHorizontal 0)
+    X B B   (Box X has boxPosVertical 1, boxPosHorizontal 0)
     B B B
 
-    This functions creates 1 Box at pos boxPosVertical, boxPosHorizontal
+    This functions creates a Box at pos boxPosVertical, boxPosHorizontal
 
     boxRow & boxCol refer to the cols and row INSIDE a box.
 
     Delving into box:
     sud->boxList[1][0]->boxMatrix:
     P P P
-    P P P
+    P P P // These are pointers to a sud matrix
     P P P
     */
+
+    // TODO: Adapt for Snakematrix
     box->boxHorizontalBound = floor(sqrt((double)sud->colLength));
     box->boxVerticalBound = floor(sqrt((double)sud->rowLength));
+
    // Memory allocation
    int ***tempBoxMatrix = (int ***)saferCalloc(boxWidth, sizeof(int**));
    for (int i = 0; i < (boxWidth); i++)
@@ -174,9 +174,6 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
    }
 
     // Assign pointers + calculate unsolvedcount
-
-    // TODO: Merge branch!!!
-    // TODO: refactor boxWidth (part of the sud);
 
     for (int boxRow = 0; boxRow < boxWidth; boxRow++)
     {
@@ -188,7 +185,6 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
 
     box->pointerMatrix = tempBoxMatrix;
     box->unsolvedCount = countBoxUnsolved(box);
-    // TODO: Snake matrix, customize boxWidth
 
     return 0;
 }
@@ -216,7 +212,7 @@ int initBoxList(struct sudoku *sud, int dataDimension)
         for (int col = 0; col < boxWidth; col++)
         {
         struct box tempBox;
-        tempBox.unsolvedCount = MAXDIMENSION+1; // TODO: Check for errors in unsolvedCount logic by searching MAXDIMENSION+1
+        tempBox.unsolvedCount = MAXDIMENSION+1;
         initBoxMatrix(&tempBox,sud, row,col, boxWidth);
         tempBoxList[row][col] = tempBox;
         }
@@ -230,30 +226,29 @@ int initBoxList(struct sudoku *sud, int dataDimension)
 
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
-    // assign one-dimensional attributes
+    // Assign one-dimensional attributes
     sud->size = *size;
     sud->rowLength = sud->colLength = *dataDimension; // square hence same length and width
     sud->backtrackIterations = 0;
     sud->solveIterations = 0;
-    // initialize Matrix via array of pointers to arrays
+    sud ->numbersFoundTotal = 0;
+    // Initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
-    sud ->numbersFoundTotal = 0;
-    // Initialize the matrix
     int **matrix = (int **)saferCalloc(rowcount, sizeof(int*)); // Dynamically allocate pointers to an array.
     for (int i = 0; i < rowcount; i++) {
         matrix[i] = (int *)saferCalloc(colcount, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
     }
-    convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
 
+    convertArrayDimension(sudokuArray, matrix, *dataDimension, *size); // convert 1D to 2D
     sud->matrix = matrix;
     printf("Sudoku initialized.\nSize: %d, Length of rows: %d, Length of cols: %d \n", sud->size, sud->colLength, sud->rowLength);
     printf("Sudoku Matrix: \n");
     printMatrix(sud->matrix, sud->rowLength, sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
     // Init boxStructure
     initBoxList(sud, *dataDimension);
-    countSudUnsolved(sud); //how many entries unsolved?
-    sud->initialUnsolved = sud->totalUnsolved;
+    countSudUnsolved(sud); // How many entries unsolved?
+    sud->initialUnsolved = sud->totalUnsolved; // set starting point of totalUnsolved
     return 0;
 }
 
@@ -654,9 +649,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     
     The argument algoChoice refers to the chosen algorithm:
 
-    0 = Simple Method (check every row, col, box)
-    1 = Backtracking using the simple method
-
+    0 = SimpleAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
+    1 = Backtracking using the simpleAlgo.
 
     */
 
@@ -736,25 +730,17 @@ int outputSudoku(struct sudoku *sud)
     return 0;}
 
 int main(int argc, char *argv[]){
-    //TODO: Enable queuing sudokus
 
-    // Default vars, can be overriden using command line flags
+    // Default preferences
     char inputFilename[] = "Input_Cases/Individual/sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
-    int algoChoice = 1;
+    int algoChoice = 1; // The default algorithm is backtracking
     fpos_t streamPos = 0; // What is the position of the current stream?
-    int tests = 1;
+    int tests = 0; // Run CI tests?
 
-    // Interpret command line arguments
-
-
-    /*char flagFilename[] = "-filename=";
-    char flagAlgoChoice[] = "-algoChoice=";
-    char flagStreamPos[] = "-streamPos=";
-    char flagTests[] = "-tests=";*/
-
-    int size = 0;
+    int size = 0; // total amount of numbers
     int dataDimension = 0; // DataDimension
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
+
     for (int i = 0; i < MAXARRAY; i++)
     {
         sudokuArray[i] = -1; 
