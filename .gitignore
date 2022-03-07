@@ -1,2 +1,4 @@
 # Ignores .exe
 *.exe
+# Ignores private notes on project
+reflection.md

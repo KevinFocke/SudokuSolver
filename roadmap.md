@@ -65,11 +65,13 @@ The interpreter keeps reading input until either a new keyword is detected, "%% 
 
 Ver 3 - Testing + Documentation:
 - Start developing on a linux environment (New WSL window)
+- Track issues on Github (possible from terminal?)
+- feat - constrainedAlgo, looks at most constrained first.
 - Add progress bar in terminal
 - Add command line recognition of flags, filename=mytext.txt (<argp.h> library, compiled using gcc, part of glibc library)
 - Add automated test cases via CI (Jenkins, Travis CI, Buddy)
 - Add automated security testing (WhiteSource Bolt, Snyk)
-- Track bugs outside of the code (github? elsewhere?)
+
 - feat outputSudoku creates a .txt with the final sudoku & input attributes.
 - feat compare initial sudoku vs end sudoku, highlight changed values in red.
 - readFile, prevent octal interpretation of code. (013 being interpreted as 1 * 8 + 3 * 1 = 11)
@@ -104,7 +106,10 @@ hash:
 
 
 Ver 5:
-- Add photo mode by extending Python with C (https://docs.python.org/2/extending/extending.html) make picture of sudoku, translates into matrix
+- Extending Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface?
+https://cffi.readthedocs.io/en/latest/overview.html
+
+- Make picture of sudoku, translates into matrix
 - Make it possible to automatically fetch sudokus from a website.
 - Support Samurai Sudoku
 - Support Snake Matrix (using boxmatrix record)

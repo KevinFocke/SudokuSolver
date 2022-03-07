@@ -21,7 +21,8 @@ struct sudoku
     int boxWidth; // TODO: refactor boxWidth to prepare for snake matrix
     int totalUnsolved;
     int initialUnsolved;
-    int numbersFoundTotal; 
+    int numbersFoundTotal;
+    int numbersFound; // state variable for numers found during algo
     int **matrix; // main representation; 2D matrix, list of pointers to arrays containing digits
     struct box **boxList; // list of pointers to Boxes, filling from top-left to right
     int solveIterations; // How many iterations did solve run?
