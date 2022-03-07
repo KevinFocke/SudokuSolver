@@ -40,8 +40,8 @@ struct box
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
-int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound);
-int simpleAlgo(struct sudoku *sud, int *numbersFound);
+int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound);
+int solidAlgo(struct sudoku *sud, int *numbersFound);
 
 // General functions
 
@@ -307,16 +307,16 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     
     The argument algoChoice refers to the chosen algorithm:
 
-    0 = SimpleAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
-    1 = Backtracking using the simpleAlgo.
+    0 = solidAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
+    1 = Backtracking using the solidAlgo.
 
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, simpleBacktrackAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud, int*) = {solidAlgo, solidBacktrackAlgo}; 
     /*array of functions
     
-    The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
+    The solidAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
     Takes arguments:
     - Struct sudoku
     - State variable for how many numbers were found in iteration
@@ -436,15 +436,15 @@ Each algorithm has two basic arguments:
 - state variable to keep track of numbers found per iteration of algo
 
 Algorithms prepend their dependencies 
-eg. simpleBacktrack depends on simpleAlgo.
-simpleAlgo depends on simpleRow, simpleCol, simpleBox, simplePoss.
+eg. solidBacktrack depends on solidAlgo.
+solidAlgo depends on solidRow, solidCol, solidBox, solidPoss.
 
 
 */
 
-// Algo - Simple Algo
+// Algo - solid Algo
 
-int simpleCheckRow(struct sudoku *sud, int number, int matrixRow)
+int solidCheckRow(struct sudoku *sud, int number, int matrixRow)
 {
     for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
     {
@@ -457,7 +457,7 @@ int simpleCheckRow(struct sudoku *sud, int number, int matrixRow)
     return 0; // No result found
 }
 
-int simpleCheckCol(struct sudoku *sud, int number, int matrixCol)
+int solidCheckCol(struct sudoku *sud, int number, int matrixCol)
 {
     for (int varDimension = 0; varDimension < sud->rowLength; varDimension++) // iterate over rows
     {
@@ -470,7 +470,7 @@ int simpleCheckCol(struct sudoku *sud, int number, int matrixCol)
     return 0; // No result found
 }
 
-int simpleCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
+int solidCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
 {
     int curValue = 0;
     for (int row = 0; row < verticalBound; row ++)
@@ -488,7 +488,7 @@ int simpleCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int
     return 0; // found no match
 }
 
-int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
+int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
 {
     int posCounter = sud->colLength; // How many possibilities are there?
 
@@ -501,7 +501,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the row
-            else if (simpleCheckRow(sud, number, row) == 1) // 
+            else if (solidCheckRow(sud, number, row) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
                 posCounter -= 1;
@@ -509,7 +509,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the col
-            else if (simpleCheckCol(sud, number, col) == 1) // found mathcing number   
+            else if (solidCheckCol(sud, number, col) == 1) // found mathcing number   
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
@@ -517,18 +517,18 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the box
-            else if (simpleCheckBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+            else if (solidCheckBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
                 continue;
-            } // remember: Potential bug in pointer arithmetic
+            }
         }
 
     return posCounter;
 }
 
-int simpleAlgo(struct sudoku *sud, int *numbersFound)
+int solidAlgo(struct sudoku *sud, int *numbersFound)
 {
 
     /*
@@ -566,7 +566,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
         eg. 5 and 9 are possible; instead of [1,1,1,1,0,1,1,1,1,0] do [5,9])
         */
 
-        int posCounter = simplePoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
+        int posCounter = solidPoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
         // Allocate memory for possibilities & initialize max possibilites.
 
         // Check if there is a single solution possible: 
@@ -600,27 +600,27 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
     return 0;
 }
 
-// Algo - Backtrack using simpleAlgo
+// Algo - Backtrack using solidAlgo
 
-int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound)
+int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound)
 {
     
     /*
     Pseudocode:
-    run simpleAlgo
-    if simpleAlgo returns 0, then exit backTrackAlgo (single iteration completed)
-    if simpleAlgo returns 1:
+    run solidAlgo
+    if solidAlgo returns 0, then exit backTrackAlgo (single iteration completed)
+    if solidAlgo returns 1:
     - find the most contstrained box in the sudoku
     - find the possibilities of that box
     - create a temp sudoku copy
     - fill in a possibility of that sudoku
-    - run solveSudoku with simpleAlgo on that field
+    - run solveSudoku with solidAlgo on that field
     -- if found, return 0
     -- if not found, try other possibility
     -- if no possibilities found, return 1
     */
 
-   int algoReturnCode = simpleAlgo(sud,numbersFound); // run algo, save return code
+   int algoReturnCode = solidAlgo(sud,numbersFound); // run algo, save return code
    
    if (algoReturnCode == 0) // Found numbers
    {
@@ -682,7 +682,7 @@ int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound)
             
             // minbox
             int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
-            int posCount = simplePoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
+            int posCount = solidPoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
             if (posCount < lowestFieldPos && posCount > 1)
             {
                 lowestFieldPos = posCount;
@@ -748,7 +748,7 @@ int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound)
 
     else
     {
-        printf("Unexpected return simpleAlgo return code.");
+        printf("Unexpected return solidAlgo return code.");
         exit(1);
     }
 
