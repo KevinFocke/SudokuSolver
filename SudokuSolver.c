@@ -231,6 +231,8 @@ int initBoxList(struct sudoku *sud, int dataDimension)
 
 int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *sud)
 {
+
+    // sudokuArray is a one-dimensional representation
     // Assign one-dimensional attributes
     sud->size = *size;
     sud->rowLength = sud->colLength = *dataDimension; // square hence same length and width

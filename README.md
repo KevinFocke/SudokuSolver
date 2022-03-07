@@ -11,8 +11,8 @@ Program structure:
 4. Output the sudoku to terminal.
 
 Design specifications:
-- Solves all sudokus up to 36 x 36.
-- Fast. Simple to use. Easy to extend.
+- Solves all square sudokus up to 36 x 36.
+- Fast and simple to use.
 - Can recognize a sudoku in a picture.
 
 
