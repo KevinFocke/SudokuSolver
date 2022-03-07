@@ -40,7 +40,7 @@ struct box
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
-int backtrackAlgo(struct sudoku *sud, int *numbersFound);
+int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound);
 int simpleAlgo(struct sudoku *sud, int *numbersFound);
 
 // General functions
@@ -313,7 +313,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, backtrackAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, simpleBacktrackAlgo}; 
     /*array of functions
     
     The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
@@ -429,7 +429,18 @@ int outputSudoku(struct sudoku *sud)
     return 0;
     }
 
-// Algorithms
+/* Algorithms
+
+Each algorithm has two basic arguments:
+- struct sudoku sud
+- state variable to keep track of numbers found per iteration of algo
+
+Algorithms prepend their dependencies 
+eg. simpleBacktrack depends on simpleAlgo.
+simpleAlgo depends on simpleRow, simpleCol, simpleBox, simplePoss.
+
+
+*/
 
 // Algo - Simple Algo
 
@@ -519,6 +530,11 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
 
 int simpleAlgo(struct sudoku *sud, int *numbersFound)
 {
+
+    /*
+    Optimizations: 
+    - Stops searching when no more possibilities; does not redundantly call checkCol after checkRow if not needed.
+    */
     int boxHorizontalBound = floor(sqrt((double)sud->colLength));
     int boxVerticalBound = floor(sqrt((double)sud->rowLength));
     int currentBoxHorizontal = 0;
@@ -584,8 +600,9 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
     return 0;
 }
 
-// Algo - Backtrack
-int backtrackAlgo(struct sudoku *sud, int *numbersFound)
+// Algo - Backtrack using simpleAlgo
+
+int simpleBacktrackAlgo(struct sudoku *sud, int *numbersFound)
 {
     
     /*
