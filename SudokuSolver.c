@@ -11,7 +11,7 @@
 
 const int MAXDIMENSION = 36; // Max dimension of sudoku. >9 is experimental.
 const int MAXITERATIONS = 1000000;  // Max iterations per sudoku
-const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // MAXARRAY is the square of maxdimension.
+const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // Used to allocate memory for matrix array.
 
 struct sudoku
 {
@@ -296,7 +296,7 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
     return 0;
 }
 
-int checkRow(struct sudoku *sud, int number, int matrixRow)
+int simpleCheckRow(struct sudoku *sud, int number, int matrixRow)
 {
     for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
     {
@@ -309,7 +309,7 @@ int checkRow(struct sudoku *sud, int number, int matrixRow)
     return 0; // No result found
 }
 
-int checkCol(struct sudoku *sud, int number, int matrixCol)
+int simpleCheckCol(struct sudoku *sud, int number, int matrixCol)
 {
     for (int varDimension = 0; varDimension < sud->rowLength; varDimension++) // iterate over rows
     {
@@ -322,7 +322,7 @@ int checkCol(struct sudoku *sud, int number, int matrixCol)
     return 0; // No result found
 }
 
-int checkBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
+int simpleCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
 {
     int curValue = 0;
     for (int row = 0; row < verticalBound; row ++)
@@ -353,7 +353,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the row
-            else if (checkRow(sud, number, row) == 1) // 
+            else if (simpleCheckRow(sud, number, row) == 1) // 
             {
                 posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
                 posCounter -= 1;
@@ -361,7 +361,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the col
-            else if (checkCol(sud, number, col) == 1) // found mathcing number   
+            else if (simpleCheckCol(sud, number, col) == 1) // found mathcing number   
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
@@ -369,7 +369,7 @@ int simplePoss(struct sudoku *sud, int row, int col, int *posArray, int currentB
             }
 
             // Check the box
-            else if (checkBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+            else if (simpleCheckBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
@@ -727,7 +727,8 @@ int outputSudoku(struct sudoku *sud)
     // save to disk
 
 
-    return 0;}
+    return 0;
+    }
 
 int main(int argc, char *argv[]){
 
