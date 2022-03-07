@@ -41,8 +41,8 @@ struct box
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
-int solidBacktrackAlgo(struct sudoku *sud);
-int solidAlgo(struct sudoku *sud);
+int robustBacktrackAlgo(struct sudoku *sud);
+int robustAlgo(struct sudoku *sud);
 
 // General functions
 
@@ -311,16 +311,16 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     
     The argument algoChoice refers to the chosen algorithm:
 
-    0 = solidAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
-    1 = Backtracking using the solidAlgo.
+    0 = robustAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
+    1 = Backtracking using the robustAlgo.
 
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud) = {solidAlgo, solidBacktrackAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud) = {robustAlgo, robustBacktrackAlgo}; 
     /*array of functions
     
-    The solidAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
+    The robustAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
     Takes arguments:
     - Struct sudoku
     - State variable for how many numbers were found in iteration
@@ -440,15 +440,15 @@ Each algorithm has two basic arguments:
 - struct sudoku sud
 
 Algorithms prepend their dependencies 
-eg. solidBacktrack depends on solidAlgo.
-solidAlgo depends on solidRow, solidCol, solidBox, solidPoss.
+eg. robustBacktrack depends on robustAlgo.
+robustAlgo depends on robustRow, robustCol, robustBox, robustPoss.
 
 
 */
 
-// Algo - solid Algo
+// Algo - robust Algo
 
-int solidCheckRow(struct sudoku *sud, int number, int matrixRow)
+int robustCheckRow(struct sudoku *sud, int number, int matrixRow)
 {
     for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
     {
@@ -461,7 +461,7 @@ int solidCheckRow(struct sudoku *sud, int number, int matrixRow)
     return 0; // No result found
 }
 
-int solidCheckCol(struct sudoku *sud, int number, int matrixCol)
+int robustCheckCol(struct sudoku *sud, int number, int matrixCol)
 {
     for (int varDimension = 0; varDimension < sud->rowLength; varDimension++) // iterate over rows
     {
@@ -474,7 +474,7 @@ int solidCheckCol(struct sudoku *sud, int number, int matrixCol)
     return 0; // No result found
 }
 
-int solidCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
+int robustCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int currentBoxVertical, int horizontalBound, int verticalBound)
 {
     int curValue = 0;
     for (int row = 0; row < verticalBound; row ++)
@@ -492,7 +492,7 @@ int solidCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int 
     return 0; // found no match
 }
 
-int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
+int robustPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBoxHorizontal, int currentBoxVertical, int boxHorizontalBound, int boxVerticalBound)
 {
     int posCounter = sud->colLength; // How many possibilities are there?
 
@@ -505,7 +505,7 @@ int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBo
             }
 
             // Check the row
-            else if (solidCheckRow(sud, number, row) == 1) // found matching number
+            else if (robustCheckRow(sud, number, row) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1; //posArray is one-indexed for consistency with number
                 posCounter -= 1;
@@ -513,7 +513,7 @@ int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBo
             }
 
             // Check the col
-            else if (solidCheckCol(sud, number, col) == 1) // found mathcing number   
+            else if (robustCheckCol(sud, number, col) == 1) // found mathcing number   
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
@@ -521,7 +521,7 @@ int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBo
             }
 
             // Check the box
-            else if (solidCheckBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
+            else if (robustCheckBox(sud, number, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound, boxVerticalBound) == 1) // found matching number
             {
                 posArray[number] = MAXDIMENSION+1;
                 posCounter -= 1;
@@ -532,7 +532,7 @@ int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBo
     return posCounter;
 }
 
-int solidAlgo(struct sudoku *sud)
+int robustAlgo(struct sudoku *sud)
 {
 
     /*
@@ -570,7 +570,7 @@ int solidAlgo(struct sudoku *sud)
         eg. 5 and 9 are possible; instead of [1,1,1,1,0,1,1,1,1,0] do [5,9])
         */
 
-        int posCounter = solidPoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
+        int posCounter = robustPoss(sud, row, col, posArray, currentBoxHorizontal, currentBoxVertical, boxHorizontalBound,boxVerticalBound); // returns the amount of possibilities; -1 is an error.
         // Allocate memory for possibilities & initialize max possibilites.
 
         // Check if there is a single solution possible: 
@@ -604,27 +604,27 @@ int solidAlgo(struct sudoku *sud)
     return 0;
 }
 
-// Algo - Backtrack using solidAlgo
+// Algo - Backtrack using robustAlgo
 
-int solidBacktrackAlgo(struct sudoku *sud)
+int robustBacktrackAlgo(struct sudoku *sud)
 {
     
     /*
     Pseudocode:
-    run solidAlgo
-    if solidAlgo returns 0, then exit backTrackAlgo (single iteration completed)
-    if solidAlgo returns 1:
+    run robustAlgo
+    if robustAlgo returns 0, then exit backTrackAlgo (single iteration completed)
+    if robustAlgo returns 1:
     - find the most contstrained box in the sudoku
     - find the possibilities of that box
     - create a temp sudoku copy
     - fill in a possibility of that sudoku
-    - run solveSudoku with solidAlgo on that field
+    - run solveSudoku with robustAlgo on that field
     -- if found, return 0
     -- if not found, try other possibility
     -- if no possibilities found, return 1
     */
 
-   int algoReturnCode = solidAlgo(sud); // run algo, save return code
+   int algoReturnCode = robustAlgo(sud); // run algo, save return code
    
    if (algoReturnCode == 0) // Found numbers
    {
@@ -686,7 +686,7 @@ int solidBacktrackAlgo(struct sudoku *sud)
             
             // minbox
             int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
-            int posCount = solidPoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
+            int posCount = robustPoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
             if (posCount < lowestFieldPos && posCount > 1)
             {
                 lowestFieldPos = posCount;
@@ -751,7 +751,7 @@ int solidBacktrackAlgo(struct sudoku *sud)
 
     else
     {
-        printf("Unexpected return solidAlgo return code.");
+        printf("Unexpected return robustAlgo return code.");
         exit(1);
     }
 
@@ -762,7 +762,7 @@ int solidBacktrackAlgo(struct sudoku *sud)
 int main(int argc, char *argv[]){
 
     // Default preferences
-    char inputFilename[] = "Input_Cases/Individual/sudoku_input_medium3.txt"; //TODO: Rename to input, Allow command line recognition of flags
+    char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; //TODO: Rename to input, Allow command line recognition of flags
     int algoChoice = 1; // The default algorithm is backtracking
     fpos_t streamPos = 0; // What is the position of the current stream?
     int tests = 0; // Run CI tests?

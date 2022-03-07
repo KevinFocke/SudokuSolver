@@ -20,9 +20,7 @@ x Implement backtracking algorithm
 
 - Refactor initBoxMatrix (current implementation assumes a square box, should allow rectangles in preparation of snake sudoku) 
 
-- Refactor initBoxList (current implementation assumes a sq)
-
-- Refactor printMatrix to use sudoku struct
+- Refactor initBoxList (current implementation assumes a square Box)
 
 - Refactor dataDimension; encapsulate within the sudoku.
 
@@ -58,6 +56,8 @@ If a number is bigger than 10 you can either use the numeric value or English al
 
 The interpreter keeps reading input until either a new keyword is detected, "%% \n", or the end of file is reached.
 
+\# can be used for comments. Everything after the # will not be interpreted on the line.
+
 - TODO: Copy this to README.md ^ (formatting under program structure, input formatting)
 
 - Support Sudoku's up to 36 x 36.
@@ -67,16 +67,29 @@ Ver 3 - Testing + Documentation:
 - Start developing on a linux environment (New WSL window)
 - Track issues on Github (possible from terminal?)
 - feat - constrainedAlgo, looks at most constrained first.
-- Add progress bar in terminal
 - Add command line recognition of flags, filename=mytext.txt (<argp.h> library, compiled using gcc, part of glibc library)
 - Add automated test cases via CI (Jenkins, Travis CI, Buddy)
+- Check for memory leaks (valgrind)
 - Add automated security testing (WhiteSource Bolt, Snyk)
 
-- feat outputSudoku creates a .txt with the final sudoku & input attributes.
-- feat compare initial sudoku vs end sudoku, highlight changed values in red.
-- readFile, prevent octal interpretation of code. (013 being interpreted as 1 * 8 + 3 * 1 = 11)
+
 
 Ver 4:
+
+- feat keywords also get copied into the output file + records get added "stats" & "solvedHash".
+stats:
+// time taken + iteration cycles + backtracking cycles
+solvedHash: 
+// takes a hash from the solved matrix and (if defined) the boxmatrix
+- readFile, prevent octal interpretation of code. (013 being interpreted as 1 * 8 + 3 * 1 = 11)
+
+
+
+Ver 5:
+- Extending Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface?
+https://cffi.readthedocs.io/en/latest/overview.html
+
+- Make picture of sudoku, translates into matrix
 
 - feat add optional input keywords; add array of optional keywords encapsulated in struct sudoku:
 
@@ -95,27 +108,14 @@ method:
 screenshot: 
 // link to a screenshot of the sudoku 
 
-hash: 
-// takes a hash from the matrix and (if defined) the boxmatrix
 
-\# can be used for comments. Everything after the # will not be interpreted on the line. 
-
-- feat keywords also get copied into the output file + records get added "stats" & "solved".
-
-- Check for memory leaks (valgrind)
-
-
-Ver 5:
-- Extending Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface?
-https://cffi.readthedocs.io/en/latest/overview.html
-
-- Make picture of sudoku, translates into matrix
+ 
 - Make it possible to automatically fetch sudokus from a website.
-- Support Samurai Sudoku
-- Support Snake Matrix (using boxmatrix record)
+
 
 Ver 6:
 
 - Create GUI for sudoku solver (QT?)
+- Support Snake Matrix (using boxmatrix record)
 - Add hint system
 - Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm ?
