@@ -41,8 +41,8 @@ struct box
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
-int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound);
-int solidAlgo(struct sudoku *sud, int *numbersFound);
+int solidBacktrackAlgo(struct sudoku *sud);
+int solidAlgo(struct sudoku *sud);
 
 // General functions
 
@@ -237,6 +237,7 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     sud->backtrackIterations = 0;
     sud->solveIterations = 0;
     sud ->numbersFoundTotal = 0;
+    sud->numbersFound = 0;
     // Initialize Matrix via array of pointers to arrays
     int rowcount = *dataDimension;
     int colcount = *dataDimension;
@@ -314,7 +315,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     */
 
     // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*) = {solidAlgo, solidBacktrackAlgo}; 
+    int (*algoMethod[])(struct sudoku *sud) = {solidAlgo, solidBacktrackAlgo}; 
     /*array of functions
     
     The solidAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
@@ -327,13 +328,13 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
 
     for (int i = sud->solveIterations; i < MAXITERATIONS; i++)
     {
-        int numbersFound = 0; // How many numbers were found this iteration?
+        sud->numbersFound = 0; // How many numbers were found this iteration?
         sud->solveIterations += 1;
         // printf("Current iteration: %i \n", sud->solveIterations);
     
-        (*algoMethod[algoChoice])(sud, &numbersFound); // Solve using the chosen algoMethod
+        (*algoMethod[algoChoice])(sud); // Solve using the chosen algoMethod
 
-    if (numbersFound == 0)
+    if (sud->numbersFound == 0)
     {
 
         if (sud->numbersFoundTotal == sud->initialUnsolved)
@@ -364,6 +365,7 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
     sudTarget->colLength = sudToCopy->colLength;
     sudTarget->initialUnsolved = sudToCopy->initialUnsolved;
     sudTarget->numbersFoundTotal = sudToCopy->numbersFoundTotal;
+    sudTarget->numbersFound = sudToCopy ->numbersFound;
     sudTarget->rowLength = sudToCopy->rowLength;
     sudTarget->size = sudToCopy->size;
     sudTarget->solveIterations = sudToCopy->solveIterations;
@@ -434,7 +436,6 @@ int outputSudoku(struct sudoku *sud)
 
 Each algorithm has two basic arguments:
 - struct sudoku sud
-- state variable to keep track of numbers found per iteration of algo
 
 Algorithms prepend their dependencies 
 eg. solidBacktrack depends on solidAlgo.
@@ -529,7 +530,7 @@ int solidPoss(struct sudoku *sud, int row, int col, int *posArray, int currentBo
     return posCounter;
 }
 
-int solidAlgo(struct sudoku *sud, int *numbersFound)
+int solidAlgo(struct sudoku *sud)
 {
 
     /*
@@ -582,7 +583,7 @@ int solidAlgo(struct sudoku *sud, int *numbersFound)
                     sud->matrix[row][col] = number;
                     // printf("\n");
                     // printMatrix(sud->matrix,sud->rowLength, sud->colLength,row,col);
-                    *numbersFound += 1;
+                    sud->numbersFound += 1;
                     sud->numbersFoundTotal += 1;
                     sud->totalUnsolved -= 1;
                 }
@@ -593,7 +594,7 @@ int solidAlgo(struct sudoku *sud, int *numbersFound)
         free(posArray);
         }
     }
-    if(*numbersFound == 0)
+    if(sud->numbersFound == 0)
     {
         return 1;
     }
@@ -603,7 +604,7 @@ int solidAlgo(struct sudoku *sud, int *numbersFound)
 
 // Algo - Backtrack using solidAlgo
 
-int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound)
+int solidBacktrackAlgo(struct sudoku *sud)
 {
     
     /*
@@ -621,7 +622,7 @@ int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound)
     -- if no possibilities found, return 1
     */
 
-   int algoReturnCode = solidAlgo(sud,numbersFound); // run algo, save return code
+   int algoReturnCode = solidAlgo(sud); // run algo, save return code
    
    if (algoReturnCode == 0) // Found numbers
    {
@@ -717,25 +718,24 @@ int solidBacktrackAlgo(struct sudoku *sud, int *numbersFound)
                     sudTemp->matrix[lowestFieldRow][lowestFieldCol] = number;
                     // printf("Trying new Matrix via backtracking\n");
                     // printMatrix(sudTemp->matrix, sudTemp->rowLength, sudTemp->colLength, lowestFieldRow, lowestFieldCol);
-                    *numbersFound += 1;
+                    sud->numbersFound += 1; // tries possibility
                     sudTemp->backtrackIterations += 1;
                     sudTemp->numbersFoundTotal += 1;
                     sudTemp->totalUnsolved -= 1;
 
                     int *iterations = (int *)saferCalloc(1,sizeof(int));
                     *iterations = MAXITERATIONS;
-                    // TODO: Think through iterations, is this fully correct?
                     solveReturnCode = solveSudoku(sudTemp, 1);
 
                     if(solveReturnCode == 0) // Found a full sudoku!
                     {
                         deepCopySud(sudTemp, sud); // The temp sudoku is the real sudoku!
-                        *numbersFound = 0; // BUG: Overcounts number by 1, temp fix
+                        sud->numbersFound = 0;
                         return 0;
                     }
                     else
                     {
-                        *numbersFound -= 1;
+                        sud->numbersFound -= 1; // undo attempted possibility
                         sud->backtrackIterations += (sudTemp->backtrackIterations) - (sud->backtrackIterations);
                         sud->solveIterations += ((sudTemp->solveIterations) - (sud->solveIterations)); 
                         free(sudTemp);
