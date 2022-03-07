@@ -36,10 +36,14 @@ struct box
     int boxVerticalBound; // height of box
 };
 
-// prototypes
+// Prototypes
 
 int solveSudoku(struct sudoku *sud, int algoChoice);
 int outputSudoku(struct sudoku *sud);
+int backtrackAlgo(struct sudoku *sud, int *numbersFound);
+int simpleAlgo(struct sudoku *sud, int *numbersFound);
+
+// General functions
 
 int printMatrix(int **matrix, int rowLength, int colLength, int highlightRow, int highlightCol)
 {
@@ -296,6 +300,139 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
     return 0;
 }
 
+int solveSudoku(struct sudoku *sud, int algoChoice)
+{
+
+    /* Multiple algorithms are available for solving sudokus. 
+    
+    The argument algoChoice refers to the chosen algorithm:
+
+    0 = SimpleAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
+    1 = Backtracking using the simpleAlgo.
+
+    */
+
+    // Main algo method
+    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, backtrackAlgo}; 
+    /*array of functions
+    
+    The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
+    Takes arguments:
+    - Struct sudoku
+    - State variable for how many numbers were found in iteration
+
+
+    */ 
+
+    for (int i = sud->solveIterations; i < MAXITERATIONS; i++)
+    {
+        int numbersFound = 0; // How many numbers were found this iteration?
+        sud->solveIterations += 1;
+        // printf("Current iteration: %i \n", sud->solveIterations);
+    
+        (*algoMethod[algoChoice])(sud, &numbersFound); // Solve using the chosen algoMethod
+
+    if (numbersFound == 0)
+    {
+
+        if (sud->numbersFoundTotal == sud->initialUnsolved)
+        {
+            // printf("All numbers were found! \n"); // backtrack base cases
+            return 0;
+        }
+        else
+        {
+            // printf("Algorithm did not find all numbers. \n");
+            return 1;
+        }
+    }
+
+    // printf("Amount of numbers found this iteration: %i \n", numbersFound);
+    }
+
+
+    return 0;
+}
+
+int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
+{
+    // *sudToCopy will be the copied sud, saved in *sudTarget
+
+    sudTarget->backtrackIterations = sudToCopy ->backtrackIterations;
+    sudTarget->boxWidth = sudToCopy->boxWidth;
+    sudTarget->colLength = sudToCopy->colLength;
+    sudTarget->initialUnsolved = sudToCopy->initialUnsolved;
+    sudTarget->numbersFoundTotal = sudToCopy->numbersFoundTotal;
+    sudTarget->rowLength = sudToCopy->rowLength;
+    sudTarget->size = sudToCopy->size;
+    sudTarget->solveIterations = sudToCopy->solveIterations;
+    sudTarget->totalUnsolved = sudToCopy ->totalUnsolved;
+    
+    // Deep copy matrix & remake boxList
+
+    //Allocate space for matrix
+    int **matrix = (int **)saferCalloc(sudToCopy->rowLength, sizeof(int*)); // Dynamically allocate pointers to an array.
+    for (int i = 0; i < sudToCopy->rowLength; i++) {
+        matrix[i] = (int *)saferCalloc(sudToCopy->colLength, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
+    }
+    sudTarget->matrix = matrix;
+
+    for (int row = 0; row < sudToCopy->rowLength; row++)
+    {
+        for (int col = 0; col < sudToCopy->colLength; col++)
+        {
+            sudTarget->matrix[row][col] = sudToCopy->matrix[row][col];
+        }
+    }
+
+    initBoxList(sudTarget, sudTarget->rowLength);
+
+    /*printf("Original matrix: \n");
+    printMatrix(sudToCopy->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
+    printf("Copied matrix: \n");
+    printMatrix(sudTarget->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);*/
+
+    return 0;
+}
+
+int outputSudoku(struct sudoku *sud)
+{
+    // print stats
+    printf("\n\n\n");
+
+    if (sud->backtrackIterations != 0)
+    {
+        printf("The code backtracked %i times \n", sud->backtrackIterations);
+    }
+
+    printf("Solving took %i iterations \n", sud->solveIterations);
+    if (sud->solveIterations >= MAXITERATIONS)
+    {
+        printf("Stopped attempting to solve sudoku because maximum iterations reached.");
+    }
+    
+    if (sud->totalUnsolved == 0)
+    {
+    // print result
+    printf("\nSudoku Solved:\n");
+    printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
+    }
+    else
+    {
+        printf("Solution not found. \n Sudoku:\n");
+        printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
+    }
+
+    // save to disk
+
+
+    return 0;
+    }
+
+// Algorithms
+
+// Algo - Simple Algo
+
 int simpleCheckRow(struct sudoku *sud, int number, int matrixRow)
 {
     for (int varDimension = 0; varDimension < sud->colLength; varDimension++) // iterate over cols
@@ -447,47 +584,7 @@ int simpleAlgo(struct sudoku *sud, int *numbersFound)
     return 0;
 }
 
-int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
-{
-    // *sudToCopy will be the copied sud, saved in *sudTarget
-
-    sudTarget->backtrackIterations = sudToCopy ->backtrackIterations;
-    sudTarget->boxWidth = sudToCopy->boxWidth;
-    sudTarget->colLength = sudToCopy->colLength;
-    sudTarget->initialUnsolved = sudToCopy->initialUnsolved;
-    sudTarget->numbersFoundTotal = sudToCopy->numbersFoundTotal;
-    sudTarget->rowLength = sudToCopy->rowLength;
-    sudTarget->size = sudToCopy->size;
-    sudTarget->solveIterations = sudToCopy->solveIterations;
-    sudTarget->totalUnsolved = sudToCopy ->totalUnsolved;
-    
-    // Deep copy matrix & remake boxList
-
-    //Allocate space for matrix
-    int **matrix = (int **)saferCalloc(sudToCopy->rowLength, sizeof(int*)); // Dynamically allocate pointers to an array.
-    for (int i = 0; i < sudToCopy->rowLength; i++) {
-        matrix[i] = (int *)saferCalloc(sudToCopy->colLength, sizeof(int)); // We now have a matrix[row][col] initialized to all zeros.
-    }
-    sudTarget->matrix = matrix;
-
-    for (int row = 0; row < sudToCopy->rowLength; row++)
-    {
-        for (int col = 0; col < sudToCopy->colLength; col++)
-        {
-            sudTarget->matrix[row][col] = sudToCopy->matrix[row][col];
-        }
-    }
-
-    initBoxList(sudTarget, sudTarget->rowLength);
-
-    /*printf("Original matrix: \n");
-    printMatrix(sudToCopy->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
-    printf("Copied matrix: \n");
-    printMatrix(sudTarget->matrix, sudToCopy->rowLength, sudToCopy->colLength, MAXDIMENSION+1, MAXDIMENSION+1);*/
-
-    return 0;
-}
-
+// Algo - Backtrack
 int backtrackAlgo(struct sudoku *sud, int *numbersFound)
 {
     
@@ -641,94 +738,6 @@ int backtrackAlgo(struct sudoku *sud, int *numbersFound)
     return 0;
 
 }
-
-int solveSudoku(struct sudoku *sud, int algoChoice)
-{
-
-    /* Multiple algorithms are available for solving sudokus. 
-    
-    The argument algoChoice refers to the chosen algorithm:
-
-    0 = SimpleAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
-    1 = Backtracking using the simpleAlgo.
-
-    */
-
-    // Main algo method
-    int (*algoMethod[])(struct sudoku *sud, int*) = {simpleAlgo, backtrackAlgo}; 
-    /*array of functions
-    
-    The simpleAlgo is algoMethod[0], backtrack is algoMethod[1] etc.
-    Takes arguments:
-    - Struct sudoku
-    - State variable for how many numbers were found in iteration
-
-
-    */ 
-
-    for (int i = sud->solveIterations; i < MAXITERATIONS; i++)
-    {
-        int numbersFound = 0; // How many numbers were found this iteration?
-        sud->solveIterations += 1;
-        // printf("Current iteration: %i \n", sud->solveIterations);
-    
-        (*algoMethod[algoChoice])(sud, &numbersFound); // Solve using the chosen algoMethod
-
-    if (numbersFound == 0)
-    {
-
-        if (sud->numbersFoundTotal == sud->initialUnsolved)
-        {
-            // printf("All numbers were found! \n"); // backtrack base cases
-            return 0;
-        }
-        else
-        {
-            // printf("Algorithm did not find all numbers. \n");
-            return 1;
-        }
-    }
-
-    // printf("Amount of numbers found this iteration: %i \n", numbersFound);
-    }
-
-
-    return 0;
-}
-
-int outputSudoku(struct sudoku *sud)
-{
-    // print stats
-    printf("\n\n\n");
-
-    if (sud->backtrackIterations != 0)
-    {
-        printf("The code backtracked %i times \n", sud->backtrackIterations);
-    }
-
-    printf("Solving took %i iterations \n", sud->solveIterations);
-    if (sud->solveIterations >= MAXITERATIONS)
-    {
-        printf("Stopped attempting to solve sudoku because maximum iterations reached.");
-    }
-    
-    if (sud->totalUnsolved == 0)
-    {
-    // print result
-    printf("\nSudoku Solved:\n");
-    printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1, MAXDIMENSION+1);
-    }
-    else
-    {
-        printf("Solution not found. \n Sudoku:\n");
-        printMatrix(sud->matrix,sud->rowLength,sud->colLength, MAXDIMENSION+1,MAXDIMENSION+1); 
-    }
-
-    // save to disk
-
-
-    return 0;
-    }
 
 int main(int argc, char *argv[]){
 
