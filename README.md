@@ -10,7 +10,8 @@ Program structure:
 3. Solve sudoku using a chosen algorithm
 4. Output the sudoku to terminal.
 
-Input format (base10):
+Input format (base10, one-indexed):
+
 >0 5 0 7 8 0 0 0 0
 >9 0 8 2 3 0 7 5 6
 >2 7 4 6 1 0 0 3 9
@@ -21,9 +22,11 @@ Input format (base10):
 >4 3 0 0 0 0 9 0 5
 >1 0 9 3 0 0 0 0 0
 
+Zero indicates an empty field.
+
 Design specifications:
-- Solves all square sudokus up to 36 x 36.
-- Fast and simple to use.
+- Solves 9 x 9 sudokus
+- Efficient algorithm and simple to use.
 - Can recognize a sudoku in a picture.
 
 

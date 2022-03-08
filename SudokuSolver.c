@@ -9,7 +9,7 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-const int MAXDIMENSION = 36; // Max dimension of sudoku. >9 is experimental.
+const int MAXDIMENSION = 9; // Max dimension of sudoku. >9 is experimental.
 const int MAXITERATIONS = 100000000;  // Max iterations per sudoku
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // Used to allocate memory for matrix array.
 
@@ -759,7 +759,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
 int main(int argc, char *argv[]){
 
     // Default preferences
-    char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; //TODO: Rename to input, Allow command line recognition of flags
+    char inputFilename[] = "Input_Cases/Individual/sudoko_input_16x16_1.txt"; //TODO: Rename to input, Allow command line recognition of flags
     int algoChoice = 1; // The default algorithm is backtracking
     fpos_t streamPos = 0; // What is the position of the current stream?
     int size = 0; // total amount of numbers

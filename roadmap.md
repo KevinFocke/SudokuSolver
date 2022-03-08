@@ -48,3 +48,7 @@ Ver 5:
 - Support Snake Matrix (using boxmatrix record)
 - Add hint system
 - Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm ?
+
+Opportunities for improvement:
+- readFile, replace scanf with a more robust function.
+- Increase testing input cases.

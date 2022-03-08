@@ -1,4 +1,5 @@
 # Ignores .exe
 *.exe
+*.pdf
 # Ignores private notes on project
 reflection.md
