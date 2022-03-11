@@ -1,5 +1,7 @@
-# Ignores .exe
+# Ignore executable & intermediate file formats
 *.exe
 *.pdf
+*.h
+*.o
 # Ignores private notes on project
 reflection.md
