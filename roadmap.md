@@ -14,41 +14,35 @@ x Refactor functions to make struct sudoku the primary data representation.
 
 x Implement backtracking algorithm
 
-- Support Sudoku's up to 36 x 36.
-
-
 Ver 3 - Testing + Documentation:
-- Start developing on a linux environment (New WSL window)
-- Track issues on Github (possible from terminal?)
-- feat - constrainedAlgo, looks at most constrained first.
-- Add command line recognition of flags, filename=mytext.txt (<argp.h> library, compiled using gcc, part of glibc library)
-- Add automated test cases via CI (Jenkins, Travis CI, Buddy)
-- Check for memory leaks (valgrind)
-- Add automated security testing (WhiteSource Bolt, Snyk)
 
+- Add command line recognition of flags, filename=mytext.txt (<argp.h> library, compiled using gcc, part of glibc library)
+- Automate test cases via CI (Jenkins, Travis CI, Buddy)
+- Automate security testing (WhiteSource Bolt, Snyk)
+- Check for memory leaks (valgrind)
+
+
+
+Personal goals:
+- Develop from linux environment (remote window to WSL2)
+- Start tracking issues on Github (possible from terminal?)
 
 
 Ver 4:
+- feat - Add photo mode; taking a picture of a sudoku 
 
-- readFile, prevent octal interpretation of code. (013 being interpreted as 1 * 8 + 3 * 1 = 11)
 
-- Extending Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface? 
+
+Personal goals:
+
+- Extend Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface? 
 https://cffi.readthedocs.io/en/latest/overview.html
 
-(possible to pass what the Python OCR reads to standard input?)
-
-- Make picture of sudoku, translates into matrix
-
-- Make it possible to automatically fetch sudokus from a website.
+(How to pass Python OCR reads to standard input?)
 
 
-Ver 5:
-
-- Create GUI for sudoku solver (QT?)
-- Support Snake Matrix (using boxmatrix record)
-- Add hint system
-- Emscripten, using clang LLVM compiler https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm ?
 
 Opportunities for improvement:
-- readFile, replace scanf with a more robust function.
+- Replace scanf in the readFile function with a more robust implementation. eg. Preventing accidental octal interpretation of the code. (013 being interpreted as 1 * 8 + 3 * 1 = 11).
 - Increase testing input cases.
+- Support more sudoku types eg. snake sudoku, samurai sudoku, …
