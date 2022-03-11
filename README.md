@@ -10,7 +10,7 @@ Program structure:
 3. Solve sudoku using a chosen algorithm
 4. Output the sudoku to terminal.
 
-Input format (base10, one-indexed):
+Input format (base10, one-indexed, zero indicates an empty field):
 
 0 5 0 7 8 0 0 0 0
 
@@ -29,8 +29,6 @@ Input format (base10, one-indexed):
 4 3 0 0 0 0 9 0 5
 
 1 0 9 3 0 0 0 0 0
-
-Zero indicates an empty field.
 
 Design specifications:
 - Solves 9 x 9 sudokus
