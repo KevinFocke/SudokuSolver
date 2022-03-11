@@ -29,9 +29,7 @@ Personal goals:
 
 
 Ver 4:
-- feat - Add photo mode; taking a picture of a sudoku 
-
-
+- Add photo mode; based on a screenshot of a sudoku, automatically interpret the sudoku & solve it.
 
 Personal goals:
 
