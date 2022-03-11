@@ -763,7 +763,7 @@ int main(int argc, char *argv[]){
     int algoChoice = 1; // The default algorithm is backtracking
     fpos_t streamPos = 0; // What is the position of the current stream?
     int size = 0; // total amount of numbers
-    int dataDimension = 0; // DataDimension
+    int dataDimension = 0; // Length of one side of a sudoku
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
 
     for (int i = 0; i < MAXARRAY; i++)
