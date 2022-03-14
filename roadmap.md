@@ -24,16 +24,31 @@ Ver 3 - Testing + Documentation:
 
 
 Personal goals:
-- Develop from linux environment (remote window to WSL2)
+- Develop from linux environment (remote window to WSL2; getting started with WSL, walkthrough within Visual Studio Code)
 - Start tracking issues on Github (possible from terminal?)
+- Calculate Big O Complexity of algos & add to documentation
 
 
 Ver 4:
-- Add photo mode; based on a screenshot of a sudoku, automatically interpret the sudoku & solve it.
+- Rewrite readFile in Python
+- Add photo mode; based on a screenshot of a sudoku, automatically interpret the sudoku & solve it. > update README
 
 Personal goals:
 
-- Extend Python with C (https://docs.python.org/2/extending/extending.html). CAPI ? ctypes & CFFI interface? 
+- Extend Python with C 
+
+Python official documentation: https://docs.python.org/3/extending/extending.html
+
+
+SWIG binder? http://www.swig.org/compare.html 
+
+Or GRPC https://grpc.io/ (seems excessive to make a client-server infrastructure, but might be good practice excercise)
+
+~~Or Cython? https://docs.cython.org/en/latest/src/quickstart/install.html~~
+Reason not used: 
+- Reduces flexibility & extendibility.
+
+ CAPI ? ctypes & CFFI interface? 
 https://cffi.readthedocs.io/en/latest/overview.html
 
 (How to pass Python OCR reads to standard input?)
