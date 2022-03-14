@@ -31,8 +31,8 @@ Input format (base10, one-indexed, zero indicates an empty field):
 1 0 9 3 0 0 0 0 0
 
 Design specifications:
-- Solves 9 x 9 sudokus
-- Efficient algorithm and simple to use.
+x Solves 9 x 9 sudokus
+x Efficient algorithm and simple to use.
 - Can recognize a sudoku in a picture.
 
 
