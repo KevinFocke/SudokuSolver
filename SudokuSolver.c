@@ -259,15 +259,12 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension, fpos_t *streamPos)
+int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension)
 {
     // TODO: Regex to set custom inputFilename
     FILE *fp;
     fp = fopen(inputFilename, "r");
     
-    const fpos_t curStreamPos = *streamPos;
-
-    fsetpos(fp, &curStreamPos); // Set position within stream (for reading in multiple sudokus
 
     *size = 0;
     printf("Scanning %s\n", inputFilename);
@@ -297,8 +294,6 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
         exit(1);
     }
 
-    fgetpos(fp, streamPos); // Remember position within stream (for reading in multile sudokus)
-    // printf("StreamPos %lli \n", *streamPos);
 
     return 0;
 }
@@ -761,7 +756,6 @@ int main(int argc, char *argv[]){
     // Default preferences
     char inputFilename[] = "Input_Cases/Individual/sudoku_input_medium.txt"; //TODO: Rename to input, Allow command line recognition of flags
     int algoChoice = 1; // The default algorithm is backtracking
-    fpos_t streamPos = 0; // What is the position of the current stream?
     int size = 0; // total amount of numbers
     int dataDimension = 0; // Length of one side of a sudoku
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
@@ -772,7 +766,7 @@ int main(int argc, char *argv[]){
     }
 
     //Function calls
-    if (readFile(inputFilename, &size, sudokuArray, &dataDimension, &streamPos))
+    if (readFile(inputFilename, &size, sudokuArray, &dataDimension))
     {
         printf("Failed to read file.");
         exit(1); // TODO: change in case of queued sudoku's, break?
