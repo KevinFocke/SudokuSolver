@@ -20,6 +20,8 @@ Ver 3 - Python Integration
 
 - Rewrite readFile in Python
 
+- Create seperate folder for C library; what is the convention?
+
 - Figure out how to dynamically recompile C program when needed! (makefile?)
 
 Ver 4 - CLI + Testing + Documentation:

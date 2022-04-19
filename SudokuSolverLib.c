@@ -751,11 +751,10 @@ int robustBacktrackAlgo(struct sudoku *sud)
 
 }
 
-int main(int argc, char *argv[]){
+int startSudoku(int algoChoice){
 
     // Default preferences
     char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; 
-    int algoChoice = 1; // The default algorithm is backtracking
     int size = 0; // total amount of numbers
     int dataDimension = 0; // Length of one side of a sudoku
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
