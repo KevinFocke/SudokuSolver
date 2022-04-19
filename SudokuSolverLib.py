@@ -62,7 +62,7 @@ class _SwigNonDynamicMeta(type):
 
 
 
-def startSudoku(algoChoice):
-    return _SudokuSolverLib.startSudoku(algoChoice)
+def startSudoku(algoChoice, inputFilename, size, dataDimension):
+    return _SudokuSolverLib.startSudoku(algoChoice, inputFilename, size, dataDimension)
 
 

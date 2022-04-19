@@ -5,4 +5,4 @@
 %}
 
 // Now list ISO C/C++ declarations
-int startSudoku(int algoChoice);
+int startSudoku(int algoChoice, char *inputFilename, int size, int dataDimension);

@@ -3,5 +3,9 @@
 *.pdf
 *.h
 *.o
+
+build*
+__pycache*
+
 # Ignores private notes on project
 reflection.md
