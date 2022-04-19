@@ -754,7 +754,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
 int main(int argc, char *argv[]){
 
     // Default preferences
-    char inputFilename[] = "Input_Cases/Individual/sudoku_input_medium.txt"; //TODO: Rename to input, Allow command line recognition of flags
+    char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; 
     int algoChoice = 1; // The default algorithm is backtracking
     int size = 0; // total amount of numbers
     int dataDimension = 0; // Length of one side of a sudoku
