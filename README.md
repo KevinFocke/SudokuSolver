@@ -71,5 +71,7 @@ Cons:
 
 Algorithmic complexity analysis:
 robustBacktrackAlgo uses the robustAlgo under the hood. It exhaustively searches the possibilities.
+
 Theoretically, the algorithmic complexity is: O( (row * col)! * n<sup>7</sup>) = O( (n * n)! * n)
+
 In practice, the algorithmic complexity is lower because of the reasons explained in the analysis of robustAlgo. Additionally, the algorithm is optimized by first looking at the most constrained box.
