@@ -118,7 +118,7 @@ int countBoxUnsolved(struct box *box)
     }
     box->unsolvedCount = boxUnsolvedCount; 
 
-    
+
     return 0;
 
 
@@ -157,11 +157,8 @@ int initBoxMatrix (struct box *box, struct sudoku *sud, int boxPosVertical, int 
     B B B
     X B B   (Box X has boxPosVertical 1, boxPosHorizontal 0)
     B B B
-
     This functions creates a Box at pos boxPosVertical, boxPosHorizontal
-
     boxRow & boxCol refer to the cols and row INSIDE a box.
-
     Delving into box:
     sud->boxList[1][0]->boxMatrix:
     P P P
@@ -204,7 +201,7 @@ int initBoxList(struct sudoku *sud)
         printf("BoxWidth sqrt flooring failed to produce round number.");
         exit (1);
     }
-    
+
 
     // Init boxList
     struct box**tempBoxList = (struct box**)saferCalloc(boxDimension, sizeof(struct box*)); 
@@ -264,7 +261,7 @@ int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimensio
     // TODO: Regex to set custom inputFilename
     FILE *fp;
     fp = fopen(inputFilename, "r");
-    
+
 
     *size = 0;
     printf("Scanning %s\n", inputFilename);
@@ -304,10 +301,8 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     /* Multiple algorithms are available for solving sudokus. 
     
     The argument algoChoice refers to the chosen algorithm:
-
     0 = robustAlgo (for each field, check every row, col, box; if there is only one possibility within the field, fill it in.)
     1 = Backtracking using the robustAlgo.
-
     */
 
     // Main algo method
@@ -318,8 +313,6 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
     Takes arguments:
     - Struct sudoku
     - State variable for how many numbers were found in iteration
-
-
     */ 
 
     for (int i = sud->solveIterations; i < MAXITERATIONS; i++)
@@ -327,7 +320,7 @@ int solveSudoku(struct sudoku *sud, int algoChoice)
         sud->numbersFound = 0; // How many numbers were found this iteration?
         sud->solveIterations += 1;
         // printf("Current iteration: %i \n", sud->solveIterations);
-    
+
         (*algoMethod[algoChoice])(sud); // Solve using the chosen algoMethod
 
     if (sud->numbersFound == 0)
@@ -366,7 +359,7 @@ int deepCopySud(struct sudoku *sudToCopy, struct sudoku *sudTarget)
     sudTarget->numbersFound = sudToCopy ->numbersFound;
     sudTarget->solveIterations = sudToCopy->solveIterations;
     sudTarget->backtrackIterations = sudToCopy ->backtrackIterations;
-    
+
     // Deep copy matrix & remake boxList
 
     //Allocate space for matrix
@@ -409,7 +402,7 @@ int outputSudoku(struct sudoku *sud)
     {
         printf("Stopped attempting to solve sudoku because maximum iterations reached.");
     }
-    
+
     if (sud->totalUnsolved == 0)
     {
     // print result
@@ -429,15 +422,11 @@ int outputSudoku(struct sudoku *sud)
     }
 
 /* Algorithms
-
 Each algorithm has two basic arguments:
 - struct sudoku sud
-
 Algorithms prepend their dependencies 
 eg. robustBacktrack depends on robustAlgo.
 robustAlgo depends on robustRow, robustCol, robustBox, robustPoss.
-
-
 */
 
 // Algo - robust Algo
@@ -475,7 +464,7 @@ int robustCheckBox(struct sudoku *sud, int number, int currentBoxHorizontal, int
     {
         for (int col = 0; col < horizontalBound; col++)
         {
-            
+
             curValue = *(sud->boxList[currentBoxVertical][currentBoxHorizontal].pointerMatrix[row][col]);
             if (curValue == number)
             {
@@ -556,7 +545,7 @@ int robustAlgo(struct sudoku *sud)
 
 
         // Eliminate possibilities
-         
+
         int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int)); 
         /* Potential optimization:
         Optimize length of posArray to match the remaining number of possibilities.  
@@ -601,7 +590,7 @@ int robustAlgo(struct sudoku *sud)
 
 int robustBacktrackAlgo(struct sudoku *sud)
 {
-    
+
     /*
     Pseudocode:
     run robustAlgo
@@ -618,7 +607,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
     */
 
    int algoReturnCode = robustAlgo(sud); // run algo, save return code
-   
+
    if (algoReturnCode == 0) // Found numbers
    {
        return 0;
@@ -627,7 +616,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
    else if (algoReturnCode == 1) // No numbers found
    {
        // Find most constrained box
-       
+
        int minBoxVertical = MAXDIMENSION + 1;
        int minBoxHorizontal = MAXDIMENSION + 1;
        int minBoxUnsolvedCount = MAXDIMENSION + 1;
@@ -647,7 +636,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
                    minBoxHorizontal = boxHorizontal;
                    minBoxUnsolvedCount = curBoxUnsolvedCount;
                }
-               
+
            }
        }
 
@@ -676,7 +665,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
         {
             for (int colBox = 0; colBox < sud->boxDimension; colBox++)
             {
-            
+
             // minbox
             int* posArray = (int*) saferCalloc(sud->colLength + 1,sizeof(int));
             int posCount = robustPoss(sud, (minBoxVertical*boxVerticalBound) + rowBox, (minBoxHorizontal*boxHorizontalBound) + colBox, posArray, minBoxHorizontal, minBoxVertical, boxHorizontalBound, boxVerticalBound);
@@ -698,7 +687,7 @@ int robustBacktrackAlgo(struct sudoku *sud)
 
         // We have lowest field now, try the possibilities
 
-        
+
 
 
         int solveReturnCode;
@@ -751,8 +740,13 @@ int robustBacktrackAlgo(struct sudoku *sud)
 
 }
 
-int startSudoku(int algoChoice, char *inputFilename, int size, int dataDimension){
+int main(int argc, char *argv[]){
 
+    // Default preferences
+    char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; 
+    int algoChoice = 1; // The default algorithm is backtracking
+    int size = 0; // total amount of numbers
+    int dataDimension = 0; // Length of one side of a sudoku
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
 
     for (int i = 0; i < MAXARRAY; i++)
@@ -766,14 +760,14 @@ int startSudoku(int algoChoice, char *inputFilename, int size, int dataDimension
         printf("Failed to read file.");
         exit(1); // TODO: change in case of queued sudoku's, break?
     }
-    
+
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
-    
+
     initSudoku(&size,&dataDimension, sudokuArray, sud) ;
     solveSudoku(sud, algoChoice);
     outputSudoku(sud);
     free(sud);
 
     return 0; // main finished succesfully 
-}
+} 
