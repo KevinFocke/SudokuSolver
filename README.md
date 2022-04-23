@@ -48,6 +48,7 @@ Implemented algorithms:
 Pros:
 - It has been tested the most
 - No excessive bells & whistles.
+
 Cons:
 - Cannot find all solutions because it does not backtrack.
 
@@ -66,6 +67,7 @@ This algorithm could be further improved by persisting the possibilities per fie
 Pros: 
 - Can find all solutions because it exhaustively explores the search space
 - Fast for 9 x 9 sudokus
+
 Cons:
 - Slow for anything above 9 x 9 sudokus because of combinatorial explosion.
 
