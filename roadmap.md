@@ -1,3 +1,7 @@
+Project goals finished as of 23 April 2022.
+
+No further updates planned.
+
 Ver 1 - The basics: 
 
 x Create a program that solves simple sudokus inefficiently. No premature optimization!

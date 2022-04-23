@@ -67,7 +67,6 @@ def convertToCParameters(filepath, algoChoice):
         
 args = convertToCParameters(filepath=inputFilePath,algoChoice = algoChoice)
 
-print(args)
 # int startSudoku(int algoChoice, int size, int dataDimension, int *sudokuArray){
     
 # None, integers, bytes objects and (unicode) strings can be passed directly as parameters
