@@ -1,7 +1,7 @@
 Compiler := gcc
 soName := SudokuSolverLib
-soOutput := SudokuSolverLib.so
-cLibrary := SudokuSolverLib.c
+soOutput := ./lib/SudokuSolverLib.so
+cLibrary := ./lib/SudokuSolverLib.c
 
 compileFunction:
 	${Compiler} -shared -Wl,-soname,${soName} -o ${soOutput} -fPIC ${cLibrary} 
