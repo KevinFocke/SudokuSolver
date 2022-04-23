@@ -16,13 +16,13 @@ x Implement backtracking algorithm
 
 Ver 3 - Python Integration
 
-- Program becomes a python program with C integrated for speed.
+x Program becomes a python program with C integrated for speed.
 
-- Rewrite readFile in Python
+x Rewrite readFile in Python
 
-- Create seperate folder for C library; what is the convention?
+x Create seperate folder for C library
 
-- Figure out how to dynamically recompile C program when needed! (makefile?)
+x Dynamically recompile using custom makefile
 
 Ver 4 - CLI + Testing + Documentation:
 
