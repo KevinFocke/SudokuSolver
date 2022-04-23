@@ -43,7 +43,10 @@ x Solves 9 x 9 sudokus
 x Efficient algorithm and simple to use.
 
 Implemented algorithms:
-1. robustAlgo: For each field, sequentially check the row, check the col, check the box. Only a single possibility in the current field? Fill in.
+
+### robustAlgo
+
+Description: For each field, sequentially check the row, check the col, check the box. Only a single possibility in the current field? Fill in.
 
 Pros:
 - It has been tested the most
@@ -62,7 +65,9 @@ However, in practice the algorithm works significantly faster for several reason
 
 This algorithm could be further improved by persisting the possibilities per field and avoiding linear search on the possArray. However, this would require more space and add unneeded complexity into the program.
 
-2. robustBacktrackAlgo: Find numbers using robustAlgo. If no further numbers are found, find the most constrained box with >= 1 available fields. Within this field, try each possibility by recursively calling robustBacktrackAlgo until a solution is found. If the possibilities are exhausted & the sudoku remains unsolved, backtrack to an earlier version & try other possibilities.
+### robustBacktrackAlgo
+
+Description: Find numbers using robustAlgo. If no further numbers are found, find the most constrained box with >= 1 available fields. Within this field, try each possibility by recursively calling robustBacktrackAlgo until a solution is found. If the possibilities are exhausted & the sudoku remains unsolved, backtrack to an earlier version & try other possibilities.
 
 Pros: 
 - Can find all solutions because it exhaustively explores the search space
