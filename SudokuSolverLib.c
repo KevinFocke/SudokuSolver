@@ -9,7 +9,7 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-const int MAXDIMENSION = 9; // Max dimension of sudoku. >9 is experimental.
+const int MAXDIMENSION = 16; // Max dimension of sudoku. >9 is experimental & known to be combinatorially explosive. In other words, it scales exponentially and slows down tremendously with scale.
 const int MAXITERATIONS = 100000000;  // Max iterations per sudoku
 const int MAXARRAY = MAXDIMENSION * MAXDIMENSION; // Used to allocate memory for matrix array.
 
@@ -740,11 +740,10 @@ int robustBacktrackAlgo(struct sudoku *sud)
 
 }
 
-int main(int argc, char *argv[]){
+int startSudoku(int algoChoice){
 
     // Default preferences
     char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; 
-    int algoChoice = 1; // The default algorithm is backtracking
     int size = 0; // total amount of numbers
     int dataDimension = 0; // Length of one side of a sudoku
     int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
