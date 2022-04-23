@@ -24,19 +24,6 @@ x Create seperate folder for C library
 
 x Dynamically recompile using custom makefile
 
-Ver 4 - CLI + Testing + Documentation:
-
-- Implement command-line flags: https://typer.tiangolo.com/ (same developer as FastAPI)
-
-Alternatively:
-https://github.com/google/python-fire 
-
-- Automate test cases via CI (Jenkins, Travis CI, Buddy)
-
-- Automate security testing (WhiteSource Bolt, Snyk)
-
-- Check for memory leaks (valgrind)
-
 
 Opportunities for improvement:
 - Support more sudoku types eg. snake sudoku, samurai sudoku, …
