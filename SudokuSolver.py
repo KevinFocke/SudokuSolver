@@ -4,7 +4,7 @@ import math
 inputFilePath = "Input_Cases/Individual/sudoku_input_difficult.txt"
 algoChoice = 1 # defaults to backtrack algo
 
-SudokuSolverLib = ctypes.CDLL('./SudokuSolverLib.so') 
+SudokuSolverLib = ctypes.CDLL('./lib/SudokuSolverLib.so') 
 
 
 def readSudInput(filepath):
