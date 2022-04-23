@@ -256,45 +256,6 @@ int initSudoku(int *size, int *dataDimension, int *sudokuArray,  struct sudoku *
     return 0;
 }
 
-int readFile(char *inputFilename, int *size, int *sudokuArray, int *dataDimension)
-{
-    // TODO: Regex to set custom inputFilename
-    FILE *fp;
-    fp = fopen(inputFilename, "r");
-
-
-    *size = 0;
-    printf("Scanning %s\n", inputFilename);
-    // TODO : Detect non-numeric characters
-    int buffer = 0;
-    while (fscanf(fp, "%d", &buffer) != EOF){
-    if (buffer < 0){
-            printf("\n Detected negative number.");
-            exit(1);
-            }
-        sudokuArray[*size] = buffer; // put current int in array
-        *size += 1;
-    }
-
-    for (int i = 1; i <= MAXDIMENSION; i++)
-    {
-        if (*size == i * i)
-        {
-            *dataDimension = i;
-            break;
-        }
-    }
-
-    if (*dataDimension == 0)
-    {
-        printf("\n Invalid size. Numbers received: %d. \n Expected a square of a number between 0 - %d. \n",*size,MAXDIMENSION);
-        exit(1);
-    }
-
-
-    return 0;
-}
-
 int solveSudoku(struct sudoku *sud, int algoChoice)
 {
 
@@ -740,27 +701,8 @@ int robustBacktrackAlgo(struct sudoku *sud)
 
 }
 
-int startSudoku(int algoChoice, int size, int dataDimension){
-
-    // Default preferences
-    char inputFilename[] = "Input_Cases/Individual/sudoku_input_difficult.txt"; 
-    // int size = 0; // total amount of numbers
-    // int dataDimension = 0; // Length of one side of a sudoku
+int startSudoku(int algoChoice, int size, int dataDimension, int *sudokuArray){
     
-    int sudokuArray[MAXARRAY]; // unsolved sudokus are zero. Unfilled sudoku elements are null. Bug value is -1.
-
-    for (int i = 0; i < MAXARRAY; i++)
-    {
-        sudokuArray[i] = -1; 
-    }
-
-    //Function calls
-    if (readFile(inputFilename, &size, sudokuArray, &dataDimension))
-    {
-        printf("Failed to read file.");
-        exit(1); // TODO: change in case of queued sudoku's, break?
-    }
-
     // Convert one-dimensional temporary array to 2D matrix in sudoku struct
     struct sudoku *sud = (struct sudoku *) saferCalloc(1, sizeof(struct sudoku)); // initialize sud pointer to struct sudoku
 

@@ -75,7 +75,7 @@ print(args)
 
 # The arguments should be provided positionally as in C!
 
-SudokuSolverLib.startSudoku(args[0],args[1],args[2])
+SudokuSolverLib.startSudoku(*args) 
 
 # Figure out how to pass array
 
